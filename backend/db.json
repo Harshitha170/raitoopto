@@ -1,0 +1,101 @@
+{
+  "admins": [
+    {
+      "username": "admin",
+      "password": "$2b$10$wN3M0U7h3Y1vI.vU.XW6euG6p6G1P2R3Z4R5R6R7R8R9R0R1R2R3R",
+      "email": "info@laserxprts.com"
+    }
+  ],
+  "students": [],
+  "questions": [
+    {
+      "_id": "q1",
+      "question": "What is the full form of CO2?",
+      "options": [
+        "Carbon dioxide",
+        "Carbon monoxide",
+        "Oxygen",
+        "Hydrogen"
+      ],
+      "correctAnswer": 0
+    },
+    {
+      "_id": "q2",
+      "question": "Common wavelength for Fiber Laser?",
+      "options": [
+        "1064nm",
+        "10.6um",
+        "532nm",
+        "355nm"
+      ],
+      "correctAnswer": 0
+    }
+  ],
+  "gallery": [
+    {
+      "imageUrl": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format",
+      "caption": "Robotic Assembly Unit",
+      "category": "Automation",
+      "_id": "1775191622030",
+      "uploadDate": "2026-04-03T04:47:02.030Z"
+    },
+    {
+      "imageUrl": "https://images.unsplash.com/photo-1565173386916-4292c00e7661?auto=format",
+      "caption": "High Precision Cutting",
+      "category": "Production",
+      "_id": "1775191622032",
+      "uploadDate": "2026-04-03T04:47:02.031Z"
+    },
+    {
+      "imageUrl": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format",
+      "caption": "Training Session",
+      "category": "Workspace",
+      "_id": "1775191622033",
+      "uploadDate": "2026-04-03T04:47:02.031Z"
+    }
+  ],
+  "jobRoles": [
+    {
+      "title": "Data Analyst",
+      "description": "We are seeking a detail-oriented and analytical Data Analyst to collect, process, and interpret data to help drive informed business decisions. The ideal candidate will transform raw data into meaningful insights, identify trends, and support strategic planning across departments.\r\n\r\n🔹 Key Responsibilities\r\nCollect, clean, and validate data from multiple sources\r\nAnalyze large datasets to identify trends, patterns, and insights\r\nCreate dashboards and reports using tools like Power BI, Tableau, or Excel\r\nCollaborate with business teams to understand data requirements\r\nPerform data visualization to present findings clearly\r\nEnsure data accuracy, integrity, and consistency\r\nSupport decision-making with actionable insights\r\nAutomate data processes and improve efficiency",
+      "responsibilities": "",
+      "skills": "",
+      "minExperience": "0",
+      "maxExperience": "1",
+      "status": "Published",
+      "jdFileUrl": "http://localhost:5000/uploads/1775189635131-Data_Analyst_Intern_JD.pdf",
+      "_id": "1775189635146",
+      "postedDate": "2026-04-03T04:13:55.146Z"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Workspace",
+      "_id": "arksqmoxa"
+    },
+    {
+      "name": "Production",
+      "_id": "3xemhwmyn"
+    },
+    {
+      "name": "Automation",
+      "_id": "05nmxp0f2"
+    },
+    {
+      "name": "Service",
+      "_id": "e4jv9hme8"
+    },
+    {
+      "name": "UAE",
+      "_id": "v55nyyyqa"
+    },
+    {
+      "name": "Maintenance",
+      "_id": "ukhoala4w"
+    },
+    {
+      "name": "Team Events",
+      "_id": "29o4sn7l0"
+    }
+  ]
+}

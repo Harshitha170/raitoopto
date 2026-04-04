@@ -1,0 +1,142 @@
+[
+  {
+    "_id": "69c62b26c314409178b22189",
+    "jobId": "69c601511f6be9723e006cd6",
+    "questionText": "What does MERN stand for?",
+    "questionType": "mcq",
+    "options": [
+      "MySQL, Express, React, Node",
+      "MongoDB, Express, React, Node",
+      "MongoDB, Angular, React, Node",
+      "MongoDB, Express, Redux, Node"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c62e47c314409178b221ba",
+    "jobId": "69c601511f6be9723e006cd6",
+    "questionText": "Which of the following is used for backend development in MERN?",
+    "questionType": "mcq",
+    "options": [
+      "React.js",
+      "Node.js",
+      "HTML",
+      "CSS"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c62f6bc314409178b221c7",
+    "jobId": "69c601511f6be9723e006cd6",
+    "questionText": "What is the primary purpose of React.js?",
+    "questionType": "mcq",
+    "options": [
+      "Building user interfaces",
+      "Database management",
+      "Backend development",
+      "Server configuration"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c62fa2c314409178b221cb",
+    "jobId": "69c601511f6be9723e006cd6",
+    "questionText": "fetch() method is used to fetch data from an API in React?",
+    "questionType": "boolean",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c62fcdc314409178b221ce",
+    "jobId": "69c601511f6be9723e006cd6",
+    "questionText": "_________ command is used to initialize a Node.js project.",
+    "questionType": "text",
+    "options": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c659e4c314409178b222bc",
+    "jobId": "69c658f7c314409178b222aa",
+    "questionText": "Which function in Excel is used to count only numeric values?",
+    "questionType": "mcq",
+    "options": [
+      "COUNTA",
+      "COUNT",
+      "COUNTIF",
+      "SUM"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c65a30c314409178b222c3",
+    "jobId": "69c658f7c314409178b222aa",
+    "questionText": "In SQL, which clause is used to filter records?",
+    "questionType": "mcq",
+    "options": [
+      "ORDER BY",
+      "GROUP BY",
+      "WHERE",
+      "SELECT"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c65a5ec314409178b222c6",
+    "jobId": "69c658f7c314409178b222aa",
+    "questionText": "What does a LEFT JOIN return in SQL?",
+    "questionType": "mcq",
+    "options": [
+      "All records from the left table and matching from the right",
+      "All records from the right table",
+      "Only matching records from both tables",
+      "Only unmatched records"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c65a8ec314409178b222c9",
+    "jobId": "69c658f7c314409178b222aa",
+    "questionText": "Which Python library is commonly used for data analysis?",
+    "questionType": "mcq",
+    "options": [
+      "NumPy",
+      "Pandas",
+      "Matplotlib",
+      "All of the above"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  },
+  {
+    "_id": "69c65abec314409178b222cc",
+    "jobId": "69c658f7c314409178b222aa",
+    "questionText": "What is the purpose of data cleaning?",
+    "questionType": "mcq",
+    "options": [
+      "To visualize data",
+      "To remove errors and inconsistencies",
+      "To store data",
+      "To delete all data"
+    ],
+    "isMandatory": true,
+    "__v": 0
+  }
+]
