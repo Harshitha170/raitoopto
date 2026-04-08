@@ -91,23 +91,23 @@ function Admin() {
   const fetchData = async (authToken = token) => {
     if(!authToken) return;
     try {
-      const jResp = await fetch("${API_BASE_URL}/api/admin/jobs", { headers: { "x-auth-token": authToken } });
+      const jResp = await fetch(`${API_BASE_URL}/api/admin/jobs`, { headers: { "x-auth-token": authToken } });
       const jData = await jResp.json();
       if (Array.isArray(jData)) setJobs(jData);
 
-      const sResp = await fetch("${API_BASE_URL}/api/admin/students", { headers: { "x-auth-token": authToken } });
+      const sResp = await fetch(`${API_BASE_URL}/api/admin/students`, { headers: { "x-auth-token": authToken } });
       const sData = await sResp.json();
       if (Array.isArray(sData)) setStudents(sData);
 
-      const qResp = await fetch("${API_BASE_URL}/api/admin/all-questions", { headers: { "x-auth-token": authToken } });
+      const qResp = await fetch(`${API_BASE_URL}/api/admin/all-questions`, { headers: { "x-auth-token": authToken } });
       const qData = await qResp.json();
       if (Array.isArray(qData)) setAllQuestions(qData);
 
-      const gResp = await fetch("${API_BASE_URL}/api/gallery");
+      const gResp = await fetch(`${API_BASE_URL}/api/gallery`);
       const gRes = await gResp.json();
       if (Array.isArray(gRes)) setGallery(gRes);
 
-      const cResp = await fetch("${API_BASE_URL}/api/categories");
+      const cResp = await fetch(`${API_BASE_URL}/api/categories`);
       const cRes = await cResp.json();
       if (Array.isArray(cRes)) {
         setCategories(cRes.map(c => c.name));
@@ -121,7 +121,7 @@ function Admin() {
   const handleAddCategory = async () => {
     if (!newCatName.trim()) return;
     try {
-      const resp = await fetch("${API_BASE_URL}/api/admin/categories", {
+      const resp = await fetch(`${API_BASE_URL}/api/admin/categories`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-auth-token": token },
         body: JSON.stringify({ name: newCatName }),
@@ -408,7 +408,7 @@ function Admin() {
                      <button 
                         onClick={async () => {
                            setLoading(true);
-                           const resp = await fetch('${API_BASE_URL}/api/admin/force-restore', { method: 'POST', headers: { 'x-auth-token': token } });
+                           const resp = await fetch(`${API_BASE_URL}/api/admin/force-restore`, { method: 'POST', headers: { 'x-auth-token': token } });
                            if(resp.ok) { setSuccess("Professional entries restored!"); fetchData(); }
                            else setError("Restore failed.");
                            setLoading(false);
@@ -572,7 +572,7 @@ function Admin() {
                                  onClick={async () => {
                                     if(window.confirm(`Notify ${s.name} about interview selection?`)) {
                                         setLoading(true);
-                                        const resp = await fetch('${API_BASE_URL}/api/admin/send-selection-email', {
+                                        const resp = await fetch(`${API_BASE_URL}/api/admin/send-selection-email`, {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
                                             body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name })
@@ -656,7 +656,7 @@ function Admin() {
                      const fd = new FormData();
                      Object.keys(jobForm).forEach(k => fd.append(k, jobForm[k]));
                      if(jdFile) fd.append('jdFile', jdFile);
-                     const resp = await fetch('${API_BASE_URL}/api/admin/jobs', { method: 'POST', headers: { 'x-auth-token': token }, body: fd });
+                     const resp = await fetch(`${API_BASE_URL}/api/admin/jobs`, { method: 'POST', headers: { 'x-auth-token': token }, body: fd });
                      if(resp.ok) { setSuccess("Job Published!"); fetchData(); setJobForm({ title: "", description: "", responsibilities: "", skills: "", minExperience: 0, maxExperience: 0, status: 'Published' }); }
                      setLoading(false);
                   }} className="btn-y" style={{ width: "100%", padding: "18px", borderRadius: "12px", background: "#f59e0b", color: "#000" }}>Publish Post</button>

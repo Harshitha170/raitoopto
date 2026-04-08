@@ -83,8 +83,8 @@ function Gallery() {
 
   useEffect(() => {
     Promise.all([
-      fetch("${API_BASE_URL}/api/gallery").then(r => r.json()),
-      fetch("${API_BASE_URL}/api/categories").then(r => r.json())
+      fetch(`${API_BASE_URL}/api/gallery`).then(r => r.json()),
+      fetch(`${API_BASE_URL}/api/categories`).then(r => r.json())
     ]).then(([galleryData, catData]) => {
       if (Array.isArray(galleryData)) setItems(galleryData);
       if (Array.isArray(catData)) setCategories(catData.map(c => c.name));

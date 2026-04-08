@@ -101,7 +101,7 @@ function Career() {
   const [jobAnswers, setJobAnswers] = useState({});
 
  useEffect(() => {
-    fetch("${API_BASE_URL}/api/jobs")
+    fetch(`${API_BASE_URL}/api/jobs`)
       .then(r => r.json())
       .then(d => { if (Array.isArray(d)) setJobs(d); })
       .catch(err => console.error("Job fetch failed", err));
@@ -136,7 +136,7 @@ function Career() {
     data.append("jobResponses", JSON.stringify(responses));
     data.append("resume", candidateInfo.resume);
     try {
-      const resp = await fetch("${API_BASE_URL}/api/career/apply", { method: "POST", body: data });
+      const resp = await fetch(`${API_BASE_URL}/api/career/apply`, { method: "POST", body: data });
       const res = await resp.json();
       if (res.success) { setTestResult(res); setStep(4); }
       else setError(res.message);

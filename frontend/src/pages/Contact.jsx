@@ -362,7 +362,7 @@ function Contact() {
     
     setError('');
     try {
-      const res = await fetch('${API_BASE_URL}/api/contact', {
+      const res = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
