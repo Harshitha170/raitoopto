@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+const getFullUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  return `${API_BASE_URL}/${url.startsWith('/') ? url.slice(1) : url}`;
+};
+
 const CAT_COLORS = {
   Technical:    { bg: '#1e3a5f', accent: '#4fc3f7' },
   Automation:   { bg: '#2d1b4e', accent: '#ce93d8' },
@@ -46,9 +52,9 @@ function Lightbox({ items, initialIndex, onClose }) {
       <div className="lb-box" onClick={e => e.stopPropagation()}>
         <button className="lb-close" onClick={onClose}>✕</button>
         {item.contentType === 'video' ? (
-          <video src={item.imageUrl} controls autoPlay className="lb-media" />
+          <video src={getFullUrl(item.imageUrl)} controls autoPlay className="lb-media" />
         ) : (
-          <img src={item.imageUrl} alt={item.caption} className="lb-media" />
+          <img src={getFullUrl(item.imageUrl)} alt={item.caption} className="lb-media" />
         )}
         <div className="lb-caption">
           <div className="lb-cat" style={{ color: CAT_COLORS[item.category]?.accent || '#ffaa00' }}>
@@ -142,9 +148,9 @@ function Gallery() {
                   <div key={item._id} className="gc rv" style={{ animationDelay: `${(idx % 8) * 0.06}s` }} onClick={() => setLightboxIndex(idx)}>
                      <div className="gc-media">
                         {item.contentType === 'video' ? (
-                          <video src={item.imageUrl} muted loop playsInline className="gc-img" />
+                          <video src={getFullUrl(item.imageUrl)} muted loop playsInline className="gc-img" />
                         ) : (
-                          <img src={item.imageUrl} alt={item.caption} className="gc-img" />
+                          <img src={getFullUrl(item.imageUrl)} alt={item.caption} className="gc-img" />
                         )}
                         <div className="gc-overlay">
                           <div className="gc-overlay-inner">

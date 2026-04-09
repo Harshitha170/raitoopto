@@ -1608,8 +1608,13 @@ details[open] > summary { color: #FFCC00 !important; border-bottom: 1px solid #e
   .leader-img { height: 350px !important; }
   
   /* Disable hover reveals and make them visible on mobile */
-  .mv-hov { height: 100% !important; opacity: 1 !important; position: relative !important; padding: 30px 20px !important; }
-  .mv-hov p { font-size: 14px !important; }
+  .mv-hov { height: 100% !important; opacity: 1 !important; position: relative !important; padding: 25px 20px !important; margin-top: 15px !important; border-top: 1px solid rgba(0,0,0,0.1); }
+  .mv-hov h4 { font-size: 18px !important; margin-bottom: 10px !important; }
+  .mv-hov p { font-size: 13px !important; }
+  
+  /* Hide the confused hover badges on mobile */
+  div[style*="textTransform: 'uppercase'"] { display: none !important; }
+  div[style*="letterSpacing: '3px'"] { display: none !important; }
 }
 
 /* 3. Small Tablets & Phones */

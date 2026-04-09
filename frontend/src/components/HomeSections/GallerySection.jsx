@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+const getFullUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  return `${API_BASE_URL}/${url.startsWith('/') ? url.slice(1) : url}`;
+};
+
 function GallerySection() {
   const [items, setItems] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -67,7 +73,7 @@ function GallerySection() {
                 borderRadius: "4px",
                 boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
               }}>
-                <img src={item.imageUrl} alt={item.caption} />
+                <img src={getFullUrl(item.imageUrl)} alt={item.caption} />
                 <div className="gallery-ov" style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.8))", padding: "20px", color: "white", opacity: 0, transform: "translateY(20px)" }}>
                     <div style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase" }}>{item.caption || "Industrial Work"}</div>
                     <div style={{ fontSize: "10px", color: "var(--Y)" }}>{item.category.toUpperCase()}</div>
