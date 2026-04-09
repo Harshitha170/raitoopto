@@ -60,6 +60,7 @@ function ProcessVideo() {
 }
 
 function Roadmap() {
+  const { t } = useTranslation();
   const milestones = [
     { year: '2017', title: t('roadmap.step1.title', 'The Beginning'), desc: t('roadmap.step1.desc', 'LEI was founded in Hosur, Tamil Nadu to disrupt the regional CO2 laser servicing market with affordable OEM quality.'), badge: 'FOUNDATION' },
     { year: '2019', title: t('roadmap.step2.title', '1000+ Machines'), desc: t('roadmap.step2.desc', 'Crossed the 1,000 machines serviced mark, establishing a broader PAN-India network.'), badge: 'MILESTONE' },
@@ -133,6 +134,7 @@ function Roadmap() {
 }
 
 function Leadership() {
+  const { t } = useTranslation();
   const leaders = [
     {
       name: t('leaders.l1.name', 'PRABAKARAN'),
