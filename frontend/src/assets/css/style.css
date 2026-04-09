@@ -26,8 +26,8 @@
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{font-family:var(--FB);background:var(--W);color:var(--INK);overflow-x:hidden;cursor:none}
 a{text-decoration:none;color:inherit}
-img{display:block;max-width:100%}
-svg{display:block;flex-shrink:0}
+img{display:block;max-width:100%;height:auto;object-fit:cover}
+svg{display:block;flex-shrink:0;max-width:100%}
 
 /* scrollbar */
 ::-webkit-scrollbar{width:3px}
@@ -437,12 +437,12 @@ footer{background:var(--DARK);border-top:1px solid rgba(255,239,0,0.1);padding:7
 .ab-vis{position:relative;height:550px;width:100%;transition:transform 0.4s ease}
 .ab-vis:hover{transform:scale(1.02)}
 .ab-blk{position:absolute;border-radius:var(--R);overflow:hidden;background:var(--BG2);border:1px solid var(--BDR)}
-.ab-main{width:480px;height:520px;top:0;left:0;border-color:rgba(255,239,0,0.28);box-shadow:0 0 40px rgba(0,0,0,0.15)}
-.ab-sm{width:220px;height:240px;bottom:-30px;right:-20px;z-index:2}
+.ab-main{width:100%;max-width:480px;height:520px;top:0;left:0;border-color:rgba(255,239,0,0.28);box-shadow:0 0 40px rgba(0,0,0,0.15)}
+.ab-sm{width:200px;height:220px;bottom:-30px;right:-10px;z-index:2}
 .ab-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--BG),var(--BG2))}
 .ab-ph svg{width:34px;height:34px;fill:rgba(0,0,0,0.15)}
 .ab-ph span{font-family:var(--FS);font-size:9px;color:var(--INK3);letter-spacing:2px;text-transform:uppercase}
-.ab-yr{position:absolute;bottom:0px;left:420px;z-index:3;background:var(--Y);padding:18px 22px;border-radius:3px;text-align:center;box-shadow:0 12px 35px rgba(255,239,0,0.4)}
+.ab-yr{position:absolute;bottom:10px;right:10px;z-index:3;background:var(--Y);padding:14px 18px;border-radius:3px;text-align:center;box-shadow:0 12px 35px rgba(255,239,0,0.4)}
 .ab-yr .n{font-family:var(--FH);font-size:32px;font-weight:900;color:var(--DARK);line-height:1}
 .ab-yr .l{font-family:var(--FS);font-size:10px;letter-spacing:2px;color:rgba(0,0,0,0.5);text-transform:uppercase}
 .ab-metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--BDR);border:1px solid var(--BDR);border-radius:var(--R);overflow:hidden;margin-bottom:26px}
@@ -1591,6 +1591,27 @@ details[open] > summary { color: #FFCC00 !important; border-bottom: 1px solid #e
   .tp-flex { padding: 10px 0 !important; }
 }
 
+/* Roadmap on phone - FORCE STACK */
+@media (max-width: 768px) {
+  .roadmap-v-line { left: 20px !important; }
+  .roadmap-point-wrap { justify-content: flex-start !important; padding-left: 50px; }
+  .roadmap-card { width: 100% !important; text-align: left !important; }
+  .roadmap-dot { left: 20px !important; }
+  .roadmap-year-bg { right: 10px !important; left: auto !important; }
+  
+  /* About Page Image Fit */
+  .ab-vis { height: auto !important; min-height: 250px !important; width: 100% !important; margin-bottom: 30px !important; }
+  .ab-blk img { object-fit: contain !important; background: #000; }
+  
+  .leader-card { flex-direction: column !important; }
+  .leader-card > div { flex: 1 1 auto !important; height: auto !important; width: 100% !important; }
+  .leader-img { height: 350px !important; }
+  
+  /* Disable hover reveals and make them visible on mobile */
+  .mv-hov { height: 100% !important; opacity: 1 !important; position: relative !important; padding: 30px 20px !important; }
+  .mv-hov p { font-size: 14px !important; }
+}
+
 /* 3. Small Tablets & Phones */
 @media (max-width: 768px) {
   .sp { padding: 60px 0 !important; }
@@ -1604,6 +1625,9 @@ details[open] > summary { color: #FFCC00 !important; border-bottom: 1px solid #e
   .tp-contact { flex-direction: column !important; align-items: center !important; gap: 8px !important; }
   
   .svc-g, .testi-g, .wings-g, .proc-g, .sg { grid-template-columns: 1fr !important; }
+  .testi-scroll-container { gap: 15px !important; }
+  .tc { padding: 30px 20px !important; min-height: 300px !important; }
+  
   .si { border-right: none !important; border-bottom: 1px solid rgba(255,239,0,0.1) !important; }
   .si:last-child { border-bottom: none !important; }
   

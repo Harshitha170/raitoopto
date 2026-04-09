@@ -103,8 +103,16 @@ function Career() {
  useEffect(() => {
     fetch(`${API_BASE_URL}/api/jobs`)
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setJobs(d); })
-      .catch(err => console.error("Job fetch failed", err));
+      .then(d => { 
+        if (Array.isArray(d)) {
+          setJobs(d); 
+          if(d.length === 0) setError("No active job openings found at the moment.");
+        } 
+      })
+      .catch(err => {
+        console.error("Job fetch failed", err);
+        setError(`CRITICAL: Career system unreachable at ${API_BASE_URL}. Ensure REACT_APP_API_URL is set in Netlify Settings -> Environment Variables. If using free tier, wait 60s for backend wake-up.`);
+      });
   }, []);
 
   const handleInfoSubmit = (e) => {
@@ -204,6 +212,13 @@ function Career() {
           {step === 1 && (
             <div>
               <h2 className="sh" style={{ textAlign: "center", marginBottom: "50px" }}>Available <span className="yl">Roles</span></h2>
+              {error && step === 1 && (
+                <div style={{ background: "#fff5f5", border: "1px dashed #feb2b2", padding: "30px", borderRadius: "12px", textAlign: "center", marginBottom: "40px", maxWidth: "600px", margin: "0 auto 40px" }}>
+                  <div style={{ fontSize: "24px", marginBottom: "10px" }}>⚠️</div>
+                  <div style={{ color: "#c53030", fontSize: "14px", fontWeight: 700, marginBottom: "8px" }}>CONNECTION ERROR</div>
+                  <div style={{ color: "#742a2a", fontSize: "13px", lineHeight: "1.6" }}>{error}</div>
+                </div>
+              )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "26px" }}>
                 {jobs.map(j => (
                   <div key={j._id} style={{

@@ -76,7 +76,7 @@ function Admin() {
         setError(res.message || "Authentication failed.");
       }
     } catch (err) {
-      setError("Server unreachable. Ensure backend is running on port 5000.");
+      setError(`CRITICAL: Server unreachable at ${API_BASE_URL}. If this is NOT localhost:5000, ensure you have set REACT_APP_API_URL in Netlify Settings -> Environment Variables and triggered a RE-DEPLOY. If it is high-load, please wait 60s for Render to wake up.`);
     }
     setLoading(false);
   };

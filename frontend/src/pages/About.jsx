@@ -61,11 +61,11 @@ function ProcessVideo() {
 
 function Roadmap() {
   const milestones = [
-    { year: '2017', title: 'The Beginning', desc: 'LEI was founded in Hosur, Tamil Nadu to disrupt the regional CO2 laser servicing market with affordable OEM quality.', badge: 'FOUNDATION' },
-    { year: '2019', title: '1000+ Machines', desc: 'Crossed the 1,000 machines serviced mark, establishing a broader PAN-India network.', badge: 'MILESTONE' },
-    { year: '2021', title: 'Fiber Laser Era', desc: 'Expanded our technical capabilities into high-power Fiber laser technologies and advanced retrofitting.', badge: 'EXPANSION' },
-    { year: '2023', title: 'International Growth', desc: 'Extended operations to the UAE, marking our first international expansion and reaching 3000+ machines.', badge: 'GLOBAL' },
-    { year: '2024', title: 'Innovation Apex', desc: 'Reached 4000+ machines globally and expanded network partnerships like Zuesskill Forge.', badge: 'PRESENT DAY' }
+    { year: '2017', title: t('roadmap.step1.title', 'The Beginning'), desc: t('roadmap.step1.desc', 'LEI was founded in Hosur, Tamil Nadu to disrupt the regional CO2 laser servicing market with affordable OEM quality.'), badge: 'FOUNDATION' },
+    { year: '2019', title: t('roadmap.step2.title', '1000+ Machines'), desc: t('roadmap.step2.desc', 'Crossed the 1,000 machines serviced mark, establishing a broader PAN-India network.'), badge: 'MILESTONE' },
+    { year: '2021', title: t('roadmap.step3.title', 'Fiber Laser Era'), desc: t('roadmap.step3.desc', 'Expanded our technical capabilities into high-power Fiber laser technologies and advanced retrofitting.'), badge: 'EXPANSION' },
+    { year: '2023', title: t('roadmap.step4.title', 'International Growth'), desc: t('roadmap.step4.desc', 'Extended operations to the UAE, marking our first international expansion and reaching 3000+ machines.'), badge: 'GLOBAL' },
+    { year: '2024', title: t('roadmap.step5.title', 'Innovation Apex'), desc: t('roadmap.step5.desc', 'Reached 4000+ machines globally and expanded network partnerships like Zuesskill Forge.'), badge: 'PRESENT DAY' }
   ];
 
   return (
@@ -135,18 +135,18 @@ function Roadmap() {
 function Leadership() {
   const leaders = [
     {
-      name: 'PRABAKARAN',
-      role: 'Founding Director',
-      quote: '"Service is not just a department, it\'s our DNA. We eliminate downtime."',
-      desc: 'With decades of experience traversing the most complex industrial scenarios across India and the Middle East, Prabakaran leads LEI with an uncompromising focus on technical perfection and an absolute commitment to zero-downtime promises.',
+      name: t('leaders.l1.name', 'PRABAKARAN'),
+      role: t('leaders.l1.role', 'Founding Director'),
+      quote: t('leaders.l1.quote', '"Service is not just a department, it\'s our DNA. We eliminate downtime."'),
+      desc: t('leaders.l1.desc', 'With decades of experience traversing the most complex industrial scenarios across India and the Middle East, Prabakaran leads LEI with an uncompromising focus on technical perfection and an absolute commitment to zero-downtime promises.'),
       img: '/Prabhakaran.webp',
       side: 'left'
     },
     {
-      name: 'HARISHA PRABAKARAN',
-      role: 'Director',
-      quote: '"Innovation and precision move us forward. We are setting global benchmarks."',
-      desc: "Spearheading the global growth strategies and operations, Harisha ensures that LEI's standard of OEM-grade servicing reaches new global benchmarks. Their vision expands operations from India to the global stage via Falcon Laser and Zuesskill.",
+      name: t('leaders.l2.name', 'HARISHA PRABAKARAN'),
+      role: t('leaders.l2.role', 'Director'),
+      quote: t('leaders.l2.quote', '"Innovation and precision move us forward. We are setting global benchmarks."'),
+      desc: t('leaders.l2.desc', "Spearheading the global growth strategies and operations, Harisha ensures that LEI's standard of OEM-grade servicing reaches new global benchmarks. Their vision expands operations from India to the global stage via Falcon Laser and Zuesskill."),
       img: '/Harisha.webp',
       side: 'right'
     }

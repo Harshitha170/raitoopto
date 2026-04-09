@@ -129,7 +129,10 @@ function Gallery() {
             </div>
           ) : filteredItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '100px', color: '#888', fontSize: '14px' }}>
-              No images in this category yet.
+              {items.length === 0 
+                ? `Connection issues with server at ${API_BASE_URL}. If you just opened the site, please wait 60s for the server to wake up.` 
+                : "No images in this category yet."
+              }
             </div>
           ) : (
             <div className="gal-masonry">

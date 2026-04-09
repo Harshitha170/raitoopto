@@ -31,7 +31,7 @@ function Testimonials() {
         <div className="testi-scroll-container" ref={scrollRef} style={{ display: "flex", gap: "30px", overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: "30px", msOverflowStyle: "none", scrollbarWidth: "none" }}>
           {testimonials.map((testi, idx) => (
             <div className="tc rv" key={idx} style={{ 
-              flex: "0 0 380px", scrollSnapAlign: "start", height: "auto", minHeight: "360px", 
+              flex: "0 0 min(380px, 85%)", scrollSnapAlign: "center", height: "auto", minHeight: "360px", 
               display: "flex", flexDirection: "column", justifyContent: "space-between",
               background: "linear-gradient(145deg, #ffffff, #f9f9f9)",
               padding: "40px", borderRadius: "20px", border: "1px solid #e2e2d8",

@@ -84,8 +84,8 @@ function Navbar() {
               <ul className="ndrop">
                 <li><Link to="/services" onClick={closeMenu}>{t('nav.specialized', 'ALL SERVICES')}</Link></li>
                 <li><Link to="/services/field-service" onClick={closeMenu}>{t('services.field-service.title', 'FIELD SERVICES')}</Link></li>
-                <li><Link to="/services/amc-contracts" onClick={closeMenu}>{t('services.amc.title', 'AMC CONTRACTS')}</Link></li>
-                <li><Link to="/services/spares-consumables" onClick={closeMenu}>{t('services.spares.title', 'SPARES AND CONSUMABLES')}</Link></li>
+                <li><Link to="/services/amc" onClick={closeMenu}>{t('services.amc.title', 'AMC CONTRACTS')}</Link></li>
+                <li><Link to="/services/spares" onClick={closeMenu}>{t('services.spares.title', 'SPARES AND CONSUMABLES')}</Link></li>
               </ul>
             </li>
             <li className="has-d">
@@ -119,15 +119,29 @@ function Navbar() {
         <button className="mcls" onClick={toggleMenu}>×</button>
         <Link to="/" onClick={closeMenu}>{t('nav.home')}</Link>
         <Link to="/about" onClick={closeMenu}>{t('nav.about')}</Link>
-        <Link to="/services" onClick={closeMenu}>{t('nav.services')}</Link>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px', width: '100%' }}>
-          <span style={{ fontFamily: 'var(--FH)', fontSize: '9px', letterSpacing: '3px', color: 'rgba(255,239,0,0.5)' }}>REPAIRS</span>
-          <Link to="/repairs/remanufacturing" onClick={closeMenu} style={{ fontSize: '14px' }}>REMANUFACTURING</Link>
-          <Link to="/repairs/turbo-blowers" onClick={closeMenu} style={{ fontSize: '14px' }}>TURBO BLOWERS</Link>
-          <Link to="/repairs/fanuc-pump" onClick={closeMenu} style={{ fontSize: '14px' }}>FANUC VACUUM PUMP</Link>
-          <Link to="/repairs/adaptive-optics" onClick={closeMenu} style={{ fontSize: '14px' }}>ADAPTIVE OPTICS</Link>
-          <Link to="/services/internal-oem" onClick={closeMenu} style={{ fontSize: '14px' }}>INTERNAL & OEM</Link>
+        
+        {/* Services Dropdown on Mobile */}
+        <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px' }}>
+          <div style={{ color: 'var(--Y)', fontSize: '10px', fontWeight: 900, textAlign: 'center', marginBottom: '10px', letterSpacing: '2px' }}>SERVICES</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+            <Link to="/services/field-service" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>FIELD SERVICE</Link>
+            <Link to="/services/amc" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>AMC CONTRACTS</Link>
+            <Link to="/services/spares" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>SPARES & CONSUMABLES</Link>
+          </div>
         </div>
+
+        {/* Repairs Dropdown on Mobile */}
+        <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px', marginTop: '16px' }}>
+          <div style={{ color: 'rgba(255,239,0,0.5)', fontSize: '10px', fontWeight: 900, textAlign: 'center', marginBottom: '10px', letterSpacing: '2px' }}>REPAIRS</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+            <Link to="/repairs/remanufacturing" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>REMANUFACTURING</Link>
+            <Link to="/repairs/turbo-blowers" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>TURBO BLOWERS</Link>
+            <Link to="/repairs/fanuc-pump" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>FANUC VACUUM PUMP</Link>
+            <Link to="/repairs/adaptive-optics" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>ADAPTIVE OPTICS</Link>
+            <Link to="/services/internal-oem" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>INTERNAL & OEM</Link>
+          </div>
+        </div>
+
         <Link to="/gallery" onClick={closeMenu}>{t('nav.gallery')}</Link>
         <Link to="/career" onClick={closeMenu}>{t('nav.career')}</Link>
         <Link to="/contact" onClick={closeMenu}>{t('nav.contact')}</Link>
