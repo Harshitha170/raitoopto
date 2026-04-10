@@ -103,6 +103,7 @@ function Navbar() {
             </li>
             <li><Link to="/gallery" className={isActive("/gallery")} onClick={closeMenu}>{t('nav.gallery')}</Link></li>
             <li><Link to="/career" className={isActive("/career")} onClick={closeMenu}>{t('nav.career')}</Link></li>
+            <li><Link to="/blogs" className={isActive("/blogs")} onClick={closeMenu}>{t('nav.blogs', 'BLOGS')}</Link></li>
             <li><Link to="/contact" className={isActive("/contact")} onClick={closeMenu}>{t('nav.contact')}</Link></li>
           </ul>
 
@@ -144,6 +145,7 @@ function Navbar() {
 
         <Link to="/gallery" onClick={closeMenu}>{t('nav.gallery')}</Link>
         <Link to="/career" onClick={closeMenu}>{t('nav.career')}</Link>
+        <Link to="/blogs" onClick={closeMenu}>{t('nav.blogs', 'BLOGS')}</Link>
         <Link to="/contact" onClick={closeMenu}>{t('nav.contact')}</Link>
         <Link to="/admin" onClick={closeMenu} style={{ fontSize: "10px", marginTop: "20px", opacity: 0.5 }}>Admin Login</Link>
       </div>

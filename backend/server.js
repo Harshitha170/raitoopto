@@ -145,16 +145,56 @@ mongoose.connect(MONGO_URI)
   });
 
 
-// --- MULTER SETUP ---
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, './uploads'),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+// --- CLOUDINARY SETUP ---
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const galleryStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, `gallery-${Date.now()}${path.extname(file.originalname)}`)
-});
+const useCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+
+// --- MULTER SETUP ---
+let storage;
+let galleryStorage;
+
+if (useCloudinary) {
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'lei-resumes',
+      resource_type: 'auto'
+    }
+  });
+
+  galleryStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'lei-gallery',
+        resource_type: 'auto'
+    }
+  });
+} else {
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
+        cb(null, './uploads');
+    },
+    filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname)
+  });
+
+  galleryStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+         if (!fs.existsSync('uploads/')) fs.mkdirSync('uploads/');
+         cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => cb(null, `gallery-${Date.now()}${path.extname(file.originalname)}`)
+  });
+}
+
 const galleryUpload = multer({
   storage: galleryStorage,
   fileFilter: (req, file, cb) => {
@@ -339,7 +379,7 @@ app.post('/api/career/apply', upload.single('resume'), async (req, res) => {
     const studentData = {
       name,
       email,
-      resumeUrl: `uploads/${req.file.filename}`,
+      resumeUrl: process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`,
       appliedRole: jobRole,
       appliedJobId: jobId,
       jobResponses: parsedResponses,
@@ -575,7 +615,7 @@ app.post('/api/admin/gallery/upload', authenticateAdmin, galleryUpload.single('i
     
     const contentType = req.file.mimetype.startsWith('video') ? 'video' : 'image';
     const itemData = {
-      imageUrl: `uploads/${req.file.filename}`,
+      imageUrl: process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`,
       caption: req.body.caption,
       category: req.body.category,
       contentType: contentType
@@ -642,7 +682,7 @@ app.get('/api/admin/jobs/:id', authenticateAdmin, async (req, res) => {
 app.post('/api/admin/jobs', authenticateAdmin, jdUpload.single('jdFile'), async (req, res) => {
   const jobData = { ...req.body };
   if (req.file) {
-    jobData.jdFileUrl = `uploads/${req.file.filename}`;
+    jobData.jdFileUrl = process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`;
   }
   
   if (isMockMode) {
@@ -659,7 +699,7 @@ app.post('/api/admin/jobs', authenticateAdmin, jdUpload.single('jdFile'), async 
 app.put('/api/admin/jobs/:id', authenticateAdmin, jdUpload.single('jdFile'), async (req, res) => {
     const updates = { ...req.body };
     if (req.file) {
-        updates.jdFileUrl = `uploads/${req.file.filename}`;
+        updates.jdFileUrl = process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`;
     }
     await DB.JobRole.findByIdAndUpdate(req.params.id, updates);
     res.json({ success: true });
