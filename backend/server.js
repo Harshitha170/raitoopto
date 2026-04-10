@@ -23,16 +23,16 @@ const SECRET = process.env.JWT_SECRET || 'LASER_EXPERT_SECRET_KEY';
 
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads')); // Serve uploaded files locally for now
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve uploaded files with absolute path
 
 // --- EMAIL TRANSPORTER ---
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // true for 465, false for other ports
+  host: process.env.EMAIL_HOST || "smtp.gmail.com",
+  port: parseInt(process.env.EMAIL_PORT) || 465,
+  secure: true,
   auth: {
-    user: 'harshuchethu3@gmail.com',
-    pass: 'gych dfek ijpk aymz'
+    user: process.env.EMAIL_USER || 'harshuchethu3@gmail.com',
+    pass: process.env.EMAIL_PASS || 'gychdfekijpkaymz' // Removed spaces for reliability
   },
   tls: {
     rejectUnauthorized: false
@@ -339,7 +339,7 @@ app.post('/api/career/apply', upload.single('resume'), async (req, res) => {
     const studentData = {
       name,
       email,
-      resumeUrl: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`,
+      resumeUrl: `uploads/${req.file.filename}`,
       appliedRole: jobRole,
       appliedJobId: jobId,
       jobResponses: parsedResponses,
@@ -491,8 +491,79 @@ app.post('/api/admin/send-selection-email', authenticateAdmin, async (req, res) 
         console.log('Email sent successfully:', info.messageId);
         res.json({ success: true, message: 'Interview selection email sent successfully!' });
     } catch (err) {
-        console.error('SERVER SMTP ERROR:', err);
-        res.status(500).json({ message: `Failed to send email: ${err.message}` });
+        console.error('CRITICAL SMTP ERROR:', err);
+        // Provide more detailed feedback to admin
+        let errorMsg = err.message;
+        if (err.code === 'EAUTH') errorMsg = "Authentication Failed: Check Gmail App Password.";
+        if (err.code === 'ESOCKET') errorMsg = "Network Error: Could not connect to SMTP server.";
+        
+        res.status(500).json({ 
+            success: false, 
+            message: `Mail Error: ${errorMsg}`,
+            technical: err.stack 
+        });
+    }
+});
+
+// a3. ADMIN - SEND REJECTION EMAIL
+app.post('/api/admin/send-rejection-email', authenticateAdmin, async (req, res) => {
+    try {
+        const { studentId, email, name } = req.body;
+        if (!email) return res.status(400).json({ message: 'Student email is required.' });
+        
+        console.log(`Sending Interview Rejection email to: ${email} (${name})`);
+
+        const mailOptions = {
+            from: '"Laser Experts India" <harshuchethu3@gmail.com>',
+            to: email,
+            subject: 'Application Status Update - Laser Experts India',
+            html: `
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background: #fafafa;">
+                    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #eeeeee; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                        <div style="background: #0A0A0C; padding: 20px; text-align: center;">
+                            <h1 style="color: #FFEF00; margin: 0; font-size: 24px;">LASER EXPERTS INDIA</h1>
+                        </div>
+                        <div style="padding: 30px; color: #333333; line-height: 1.6;">
+                            <h2 style="color: #0A0A0C; font-size: 20px; margin-top: 0;">Dear ${name},</h2>
+                            <p style="font-size: 16px;">
+                                Thank you for your interest in joining <strong>Laser Experts India</strong> and for taking the time to go through our application process.
+                            </p>
+                            <p style="font-size: 16px;">
+                                After careful consideration of your profile and assessment results, we regret to inform you that we will not be moving forward with your application at this time.
+                            </p>
+                            <p style="font-size: 14px; background: #FFF9C4; padding: 15px; border-left: 4px solid #FBC02D; margin: 20px 0;">
+                                We encourage you to apply for future openings that match your skills. We wish you the best in your career endeavors.
+                            </p>
+                            <p style="font-size: 14px;">
+                                Best Regards,<br>
+                                <strong>HR Department</strong><br>
+                                Laser Experts India
+                            </p>
+                        </div>
+                        <div style="background: #f4f4f4; padding: 15px; text-align: center; border-top: 1px solid #eeeeee;">
+                            <p style="font-size: 11px; color: #999999; margin: 0;">
+                                This is an automated notification. Please do not reply directly to this email.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Rejection email sent successfully:', info.messageId);
+        res.json({ success: true, message: 'Rejection email sent successfully!' });
+    } catch (err) {
+        console.error('CRITICAL SMTP ERROR:', err);
+        let errorMsg = err.message;
+        if (err.code === 'EAUTH') errorMsg = "Authentication Failed: Check Gmail App Password.";
+        if (err.code === 'ESOCKET') errorMsg = "Network Error: Could not connect to SMTP server.";
+        
+        res.status(500).json({ 
+            success: false, 
+            message: `Mail Error: ${errorMsg}`,
+            technical: err.stack 
+        });
     }
 });
 
@@ -504,7 +575,7 @@ app.post('/api/admin/gallery/upload', authenticateAdmin, galleryUpload.single('i
     
     const contentType = req.file.mimetype.startsWith('video') ? 'video' : 'image';
     const itemData = {
-      imageUrl: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`,
+      imageUrl: `uploads/${req.file.filename}`,
       caption: req.body.caption,
       category: req.body.category,
       contentType: contentType
@@ -571,7 +642,7 @@ app.get('/api/admin/jobs/:id', authenticateAdmin, async (req, res) => {
 app.post('/api/admin/jobs', authenticateAdmin, jdUpload.single('jdFile'), async (req, res) => {
   const jobData = { ...req.body };
   if (req.file) {
-    jobData.jdFileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    jobData.jdFileUrl = `uploads/${req.file.filename}`;
   }
   
   if (isMockMode) {
@@ -588,7 +659,7 @@ app.post('/api/admin/jobs', authenticateAdmin, jdUpload.single('jdFile'), async 
 app.put('/api/admin/jobs/:id', authenticateAdmin, jdUpload.single('jdFile'), async (req, res) => {
     const updates = { ...req.body };
     if (req.file) {
-        updates.jdFileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+        updates.jdFileUrl = `uploads/${req.file.filename}`;
     }
     await DB.JobRole.findByIdAndUpdate(req.params.id, updates);
     res.json({ success: true });

@@ -4,6 +4,13 @@ import { useTranslation } from "react-i18next";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+const getFullUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http') && !url.includes('localhost:5000')) return url;
+  const cleanPath = url.replace(/^https?:\/\/[^\/]+\//, '').replace(/^\//, '');
+  return `${API_BASE_URL}/${cleanPath}`;
+};
+
 const SOCIAL_LINKS = {
   facebook: "https://www.facebook.com/laserexpertsindia",
   instagram: "https://www.instagram.com/laserexpertsindia",
@@ -26,6 +33,7 @@ function Admin() {
   const [viewState, setViewState] = useState('list'); 
   const [editingQId, setEditingQId] = useState(null);
   const [galleryForm, setGalleryForm] = useState({ caption: "", category: "Workspace" });
+  const [galleryFile, setGalleryFile] = useState(null);
   
   const [gallery, setGallery] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -90,6 +98,7 @@ function Admin() {
 
   const fetchData = async (authToken = token) => {
     if(!authToken) return;
+    setLoading(true);
     try {
       const jResp = await fetch(`${API_BASE_URL}/api/admin/jobs`, { headers: { "x-auth-token": authToken } });
       const jData = await jResp.json();
@@ -114,6 +123,43 @@ function Admin() {
       }
     } catch (err) {
       setError("Data fetch failed. Backend may be offline.");
+    }
+    setLoading(false);
+  };
+
+  const handleGalleryUpload = async () => {
+    if (!galleryFile) {
+      setError("Please select a file to upload.");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append("image", galleryFile);
+      fd.append("caption", galleryForm.caption);
+      fd.append("category", galleryForm.category || (categories[0] || "Workspace"));
+
+      const resp = await fetch(`${API_BASE_URL}/api/admin/gallery/upload`, {
+        method: "POST",
+        headers: { "x-auth-token": token },
+        body: fd
+      });
+      if (resp.ok) {
+        setSuccess("Media uploaded successfully!");
+        setTimeout(() => setSuccess(""), 3000);
+        setGalleryForm({ caption: "", category: categories[0] || "Workspace" });
+        setGalleryFile(null);
+        // Clear file input visually
+        const fileInput = document.getElementById("galleryFileInput");
+        if (fileInput) fileInput.value = "";
+        fetchData();
+      } else {
+        const errorData = await resp.json();
+        setError(errorData.message || "Failed to upload media.");
+      }
+    } catch (err) {
+      setError("Upload failed.");
     }
     setLoading(false);
   };
@@ -510,9 +556,16 @@ function Admin() {
                 </div>
 
                 <div className="admin-card">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px", flexWrap: "wrap", gap: "10px" }}>
                      <h3 style={{ fontSize: "18px", margin: 0 }}>Visual Library</h3>
-                     <div style={{ display: "flex", gap: "10px" }}>
+                     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                        <input 
+                          type="text" 
+                          placeholder="Image Caption" 
+                          value={galleryForm.caption}
+                          onChange={e => setGalleryForm({...galleryForm, caption: e.target.value})}
+                          style={{ padding: "10px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: "#fff" }}
+                        />
                         <select 
                           value={galleryForm.category} 
                           onChange={(e) => setGalleryForm({ ...galleryForm, category: e.target.value })}
@@ -520,14 +573,15 @@ function Admin() {
                         >
                           {categories.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
-                        <button className="btn-y" style={{ borderRadius: "10px" }}>Upload Media</button>
+                        <input type="file" id="galleryFileInput" onChange={e => setGalleryFile(e.target.files[0])} style={{ padding: "8px", borderRadius: "8px", border: "1px dashed rgba(255,239,0,0.5)", color: "rgba(255,255,255,0.7)" }} />
+                        <button onClick={handleGalleryUpload} className="btn-y" style={{ borderRadius: "10px" }} disabled={loading}>{loading ? "Uploading..." : "Upload Media"}</button>
                      </div>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "25px" }}>
                     {gallery.map(g => (
                       <div key={g._id} className="gal-item-card" style={{ borderRadius: "20px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.05)", position: "relative", background: "rgba(255,255,255,0.02)" }}>
                         <div style={{ height: "200px", background: "#000" }}>
-                            {g.contentType === 'video' ? <video src={g.imageUrl} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : <img src={g.imageUrl} alt="" style={{width:"100%", height:"100%", objectFit:"cover"}} />}
+                            {g.contentType === 'video' ? <video src={getFullUrl(g.imageUrl)} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : <img src={getFullUrl(g.imageUrl)} alt="" style={{width:"100%", height:"100%", objectFit:"cover"}} />}
                         </div>
                         <div style={{ padding: "20px" }}>
                             <div style={{ fontSize: "14px", fontWeight: 800 }}>{g.caption || "Industrial Shot"}</div>
@@ -567,7 +621,7 @@ function Admin() {
                          </td>
                          <td style={{ padding: "20px", textAlign: "center", borderRadius: "0 12px 12px 0" }}>
                             <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-                               <a href={s.resumeUrl} target="_blank" rel="noreferrer" title="View Resume" style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><i className="fas fa-file-download"></i></a>
+                               <a href={getFullUrl(s.resumeUrl)} target="_blank" rel="noreferrer" title="View Resume" style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><i className="fas fa-file-download"></i></a>
                                <button 
                                  onClick={async () => {
                                     if(window.confirm(`Notify ${s.name} about interview selection?`)) {
@@ -589,6 +643,29 @@ function Admin() {
                                  title="Accept & Notify"
                                  style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", cursor: "pointer" }}
                                ><i className="fas fa-paper-plane"></i></button>
+
+                               {/* Reject & Notify button added directly below/next to Accept button */}
+                               <button 
+                                 onClick={async () => {
+                                    if(window.confirm(`Revoke application and notify ${s.name} about rejection?`)) {
+                                        setLoading(true);
+                                        const resp = await fetch(`${API_BASE_URL}/api/admin/send-rejection-email`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                                            body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name })
+                                        });
+                                        const res = await resp.json();
+                                        if(res.success) {
+                                             setSuccess(res.message);
+                                             setTimeout(() => setSuccess(""), 10000);
+                                         }
+                                        else setError(res.message);
+                                        setLoading(false);
+                                    }
+                                 }}
+                                 title="Reject & Notify"
+                                 style={{ width: "38px", height: "38px", borderRadius: "10px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#ef4444", cursor: "pointer" }}
+                               ><i className="fas fa-times"></i></button>
                             </div>
                          </td>
                        </tr>

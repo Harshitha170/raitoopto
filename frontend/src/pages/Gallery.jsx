@@ -5,8 +5,13 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const getFullUrl = (url) => {
   if (!url) return '';
-  if (url.startsWith('http')) return url;
-  return `${API_BASE_URL}/${url.startsWith('/') ? url.slice(1) : url}`;
+  // If it's already a full external URL (like Unsplash), keep it
+  if (url.startsWith('http') && !url.includes('localhost:5000')) return url;
+  
+  // If it's a relative path or a hardcoded localhost path from previous DB entries
+  // we clean it up to use the current API_BASE_URL
+  const cleanPath = url.replace(/^https?:\/\/[^\/]+\//, '').replace(/^\//, '');
+  return `${API_BASE_URL}/${cleanPath}`;
 };
 
 const CAT_COLORS = {

@@ -5,8 +5,9 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const getFullUrl = (url) => {
   if (!url) return '';
-  if (url.startsWith('http')) return url;
-  return `${API_BASE_URL}/${url.startsWith('/') ? url.slice(1) : url}`;
+  if (url.startsWith('http') && !url.includes('localhost:5000')) return url;
+  const cleanPath = url.replace(/^https?:\/\/[^\/]+\//, '').replace(/^\//, '');
+  return `${API_BASE_URL}/${cleanPath}`;
 };
 
 function GallerySection() {

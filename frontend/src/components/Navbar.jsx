@@ -121,24 +121,24 @@ function Navbar() {
         <Link to="/about" onClick={closeMenu}>{t('nav.about')}</Link>
         
         {/* Services Dropdown on Mobile */}
-        <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px' }}>
-          <div style={{ color: 'var(--Y)', fontSize: '10px', fontWeight: 900, textAlign: 'center', marginBottom: '10px', letterSpacing: '2px' }}>SERVICES</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-            <Link to="/services/field-service" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>FIELD SERVICE</Link>
-            <Link to="/services/amc" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>AMC CONTRACTS</Link>
-            <Link to="/services/spares" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>SPARES & CONSUMABLES</Link>
+        <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '10px' }}>
+          <div style={{ color: 'var(--Y)', fontSize: '9px', fontWeight: 900, textAlign: 'center', marginBottom: '6px', letterSpacing: '2px' }}>SERVICES</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+            <Link to="/services/field-service" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>FIELD SERVICE</Link>
+            <Link to="/services/amc" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>AMC CONTRACTS</Link>
+            <Link to="/services/spares" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>SPARES & CONSUMABLES</Link>
           </div>
         </div>
 
         {/* Repairs Dropdown on Mobile */}
-        <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '16px', marginTop: '16px' }}>
-          <div style={{ color: 'rgba(255,239,0,0.5)', fontSize: '10px', fontWeight: 900, textAlign: 'center', marginBottom: '10px', letterSpacing: '2px' }}>REPAIRS</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
-            <Link to="/repairs/remanufacturing" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>REMANUFACTURING</Link>
-            <Link to="/repairs/turbo-blowers" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>TURBO BLOWERS</Link>
-            <Link to="/repairs/fanuc-pump" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>FANUC VACUUM PUMP</Link>
-            <Link to="/repairs/adaptive-optics" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>ADAPTIVE OPTICS</Link>
-            <Link to="/services/internal-oem" onClick={closeMenu} style={{ fontSize: '14px', padding: '5px 0' }}>INTERNAL & OEM</Link>
+        <div style={{ width: '100%', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '10px', marginTop: '10px' }}>
+          <div style={{ color: 'rgba(255,239,0,0.5)', fontSize: '9px', fontWeight: 900, textAlign: 'center', marginBottom: '6px', letterSpacing: '2px' }}>REPAIRS</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+            <Link to="/repairs/remanufacturing" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>REMANUFACTURING</Link>
+            <Link to="/repairs/turbo-blowers" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>TURBO BLOWERS</Link>
+            <Link to="/repairs/fanuc-pump" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>FANUC VACUUM PUMP</Link>
+            <Link to="/repairs/adaptive-optics" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>ADAPTIVE OPTICS</Link>
+            <Link to="/services/internal-oem" onClick={closeMenu} style={{ fontSize: '11px', padding: '3px 0' }}>INTERNAL & OEM</Link>
           </div>
         </div>
 
