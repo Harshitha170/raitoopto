@@ -26,14 +26,12 @@ function AdaptiveOptics() {
   return (
     <div style={{ fontFamily: 'var(--FB)' }}>
 
-      <section style={{ height: '50vh', minHeight: '320px', background: '#e8eaed', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px 0 20px' }}>
-        <div style={{ position: 'relative', width: '100%', maxWidth: '1200px', height: '100%', borderRadius: '24px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/homeimage1.png.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.55)', transform: 'scale(1.02)' }} />
-          <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 20px' }}>
-            <h1 style={{ fontFamily: 'var(--FH)', fontSize: 'clamp(32px, 6vw, 70px)', fontWeight: 900, color: '#FFCC00', letterSpacing: '4px', lineHeight: 1, margin: 0, textShadow: '0 4px 30px rgba(0,0,0,0.6)', textTransform: 'uppercase' }}>
-              ADAPTIVE OPTICS
-            </h1>
-          </div>
+      <section style={{ position: 'relative', height: '50vh', minHeight: '360px', background: '#0a0a0a', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'url(/homeimage1.png.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.55)' }} />
+        <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 20px' }}>
+          <h1 style={{ fontFamily: 'var(--FH)', fontSize: 'clamp(32px, 6vw, 70px)', fontWeight: 900, color: '#FFCC00', letterSpacing: '4px', lineHeight: 1, margin: 0, textShadow: '0 4px 30px rgba(0,0,0,0.6)', textTransform: 'uppercase' }}>
+            ADAPTIVE OPTICS
+          </h1>
         </div>
       </section>
 

@@ -4,77 +4,70 @@ import { useTranslation } from 'react-i18next';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-/* ─── Branch data with corrected SVG coordinates ─── */
+/* ─── Branch data with verified addresses and direct search links ─── */
 const BRANCHES = [
   {
     city: 'HOSUR (HQ)',
-    addr: 'Zuzuvadi, Tamil Nadu',
+    addr: 'H149, TNHB Phase 9, Krishnagiri, Hosur, Tamil Nadu 635109',
     emoji: '🏭',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Tamil Nadu — near Bangalore border */
-    x: 218, y: 482,
-    mapLink: 'https://maps.google.com/?q=12.7409,77.8253'
+    x: 218, y: 485,
+    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Hosur+Tamil+Nadu/'
   },
   {
     city: 'CHENNAI',
-    addr: 'Ambattur Regional Office',
+    addr: 'No. 66, Ramapuram, Ambattur, Chennai, Tamil Nadu 600053',
     emoji: '🎡',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* East coast Tamil Nadu */
     x: 252, y: 468,
-    mapLink: 'https://maps.google.com/?q=13.1143,80.1548'
+    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Ambattur+Chennai/'
   },
   {
     city: 'BANGALORE',
-    addr: 'Peenya Industrial Area Phase 3',
+    addr: 'No. 87, Peenya Industrial Area Phase 3, Bangalore 560058',
     emoji: '🏛️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Peenya, Bangalore - 560058 */
-    x: 207, y: 462,
-    mapLink: 'https://maps.google.com/?q=13.0287,77.5069'
+    x: 207, y: 472,
+    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Peenya+Bangalore/'
   },
   {
     city: 'HYDERABAD',
-    addr: 'Charminar District',
+    addr: 'Plot No. 50, Chengicheria Village, Medchal-Malkajgiri, Hyderabad 500039',
     emoji: '🕌',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Telangana — central south */
-    x: 232, y: 388,
-    mapLink: 'https://maps.google.com/?q=17.3616,78.4747'
+    x: 232, y: 395,
+    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Hyderabad/'
   },
   {
     city: 'PUNE',
-    addr: 'Pimpri-Chinchwad Industrial',
+    addr: 'Pimpri-Chinchwad Industrial Area, Pune, Maharashtra',
     emoji: '🏰',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Maharashtra — west central */
     x: 162, y: 358,
-    mapLink: 'https://maps.google.com/?q=18.6298,73.7997'
+    mapLink: 'https://www.google.com/maps/place/Laser+Experts+India+LLP+Pune/'
   },
   {
     city: 'DELHI / NCR',
-    addr: 'Okhla Industrial Area',
+    addr: 'Okhla Industrial Area, New Delhi 110020',
     emoji: '⛩️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* North India */
     x: 208, y: 148,
-    mapLink: 'https://maps.google.com/?q=28.5355,77.3910'
+    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Okhla+Delhi/'
   },
   {
     city: 'UAE',
-    addr: 'Downtown Dubai',
+    addr: 'Office No. 152, Masfout, Ajman, UAE 33139',
     emoji: '🏙️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Off-map left — west of India */
     x: 60, y: 268,
-    mapLink: 'https://maps.google.com/?q=25.1972,55.2744'
+    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Ajman+UAE/'
   }
 ];
 
