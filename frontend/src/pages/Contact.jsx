@@ -12,9 +12,9 @@ const BRANCHES = [
     emoji: '🏭',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Tamil Nadu South Central */
-    x: 208, y: 518,
-    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Hosur+Tamil+Nadu/'
+    /* Tamil Nadu — near Bangalore border */
+    x: 218, y: 482,
+    mapLink: 'https://maps.google.com/?q=12.7409,77.8253'
   },
   {
     city: 'CHENNAI',
@@ -22,19 +22,19 @@ const BRANCHES = [
     emoji: '🎡',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* East Coast South */
-    x: 242, y: 495,
-    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Chennai/'
+    /* East coast Tamil Nadu */
+    x: 252, y: 468,
+    mapLink: 'https://maps.google.com/?q=13.1143,80.1548'
   },
   {
     city: 'BANGALORE',
-    addr: 'Electronic City Area',
+    addr: 'Peenya Industrial Area Phase 3',
     emoji: '🏛️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Near Hosur */
-    x: 198, y: 498,
-    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Bangalore/'
+    /* Peenya, Bangalore - 560058 */
+    x: 207, y: 462,
+    mapLink: 'https://maps.google.com/?q=13.0287,77.5069'
   },
   {
     city: 'HYDERABAD',
@@ -42,9 +42,9 @@ const BRANCHES = [
     emoji: '🕌',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Central South */
-    x: 225, y: 395,
-    mapLink: 'https://www.google.com/maps/place/Charminar/@17.3615636,78.4746645,17z/'
+    /* Telangana — central south */
+    x: 232, y: 388,
+    mapLink: 'https://maps.google.com/?q=17.3616,78.4747'
   },
   {
     city: 'PUNE',
@@ -52,9 +52,9 @@ const BRANCHES = [
     emoji: '🏰',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* West Coast */
-    x: 165, y: 355,
-    mapLink: 'https://www.google.com/maps/search/Pune+Pimpri+Chinchwad/'
+    /* Maharashtra — west central */
+    x: 162, y: 358,
+    mapLink: 'https://maps.google.com/?q=18.6298,73.7997'
   },
   {
     city: 'DELHI / NCR',
@@ -62,9 +62,9 @@ const BRANCHES = [
     emoji: '⛩️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* North */
-    x: 205, y: 145,
-    mapLink: 'https://www.google.com/maps/search/Okhla+Industrial+Area+Delhi/'
+    /* North India */
+    x: 208, y: 148,
+    mapLink: 'https://maps.google.com/?q=28.5355,77.3910'
   },
   {
     city: 'UAE',
@@ -72,9 +72,9 @@ const BRANCHES = [
     emoji: '🏙️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
-    /* Off map left */
-    x: 75, y: 310,
-    mapLink: 'https://www.google.com/maps/place/Burj+Khalifa/@25.197197,55.274288,17z/'
+    /* Off-map left — west of India */
+    x: 60, y: 268,
+    mapLink: 'https://maps.google.com/?q=25.1972,55.2744'
   }
 ];
 
