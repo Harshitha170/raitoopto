@@ -107,6 +107,18 @@ function Roadmap() {
 
                 <div 
                   className="roadmap-card" 
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-10px)';
+                    e.currentTarget.style.borderColor = 'var(--Y)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.boxShadow = '0 10px 30px rgba(255,239,0,0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                   style={{
                     width: '44%',
                     background: 'rgba(255,255,255,0.02)',
@@ -248,16 +260,17 @@ function VideoSection() {
     <div
       ref={containerRef}
       style={{
-        width: '100vw',
+        width: '100%',
+        maxWidth: '1000px',
+        margin: '0 auto',
         position: 'relative',
-        left: '50%',
-        right: '50%',
-        marginLeft: '-50vw',
-        marginRight: '-50vw',
         height: 'auto',
         aspectRatio: '16 / 9',
         background: '#000',
         overflow: 'hidden',
+        borderRadius: '16px',
+        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+        marginBottom: '60px'
       }}
     >
       <video

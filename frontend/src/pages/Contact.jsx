@@ -20,8 +20,8 @@ const BRANCHES = [
     city: 'CHENNAI',
     addr: 'Ambattur Regional Office',
     emoji: '🎡',
-    color: '#FF6B35',
-    textColor: '#fff',
+    color: '#FFEF00',
+    textColor: '#0A0A0C',
     /* East Coast South */
     x: 242, y: 495,
     mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Chennai/'
@@ -30,8 +30,8 @@ const BRANCHES = [
     city: 'BANGALORE',
     addr: 'Electronic City Area',
     emoji: '🏛️',
-    color: '#4FC3F7',
-    textColor: '#fff',
+    color: '#FFEF00',
+    textColor: '#0A0A0C',
     /* Near Hosur */
     x: 198, y: 498,
     mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Bangalore/'
@@ -40,8 +40,8 @@ const BRANCHES = [
     city: 'HYDERABAD',
     addr: 'Charminar District',
     emoji: '🕌',
-    color: '#CE93D8',
-    textColor: '#fff',
+    color: '#FFEF00',
+    textColor: '#0A0A0C',
     /* Central South */
     x: 225, y: 395,
     mapLink: 'https://www.google.com/maps/place/Charminar/@17.3615636,78.4746645,17z/'
@@ -50,7 +50,7 @@ const BRANCHES = [
     city: 'PUNE',
     addr: 'Pimpri-Chinchwad Industrial',
     emoji: '🏰',
-    color: '#69F0AE',
+    color: '#FFEF00',
     textColor: '#0A0A0C',
     /* West Coast */
     x: 165, y: 355,
@@ -60,8 +60,8 @@ const BRANCHES = [
     city: 'DELHI / NCR',
     addr: 'Okhla Industrial Area',
     emoji: '⛩️',
-    color: '#FF80AB',
-    textColor: '#fff',
+    color: '#FFEF00',
+    textColor: '#0A0A0C',
     /* North */
     x: 205, y: 145,
     mapLink: 'https://www.google.com/maps/search/Okhla+Industrial+Area+Delhi/'
@@ -70,7 +70,7 @@ const BRANCHES = [
     city: 'UAE',
     addr: 'Downtown Dubai',
     emoji: '🏙️',
-    color: '#CFD8DC',
+    color: '#FFEF00',
     textColor: '#0A0A0C',
     /* Off map left */
     x: 75, y: 310,
@@ -548,9 +548,6 @@ function Contact() {
                        <span style={{ position: 'relative', zIndex: 1 }}>{b.emoji}</span>
                     </div>
                     <div style={{ flex: 1, padding: '18px' }}>
-                       <div style={{ fontSize: '9px', color: 'var(--Y)', fontWeight: 900, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '4px', background: '#000', display: 'inline-block', padding: '2px 8px', borderRadius: '4px' }}>
-                          DIRECT SERVICE UNIT
-                       </div>
                        <div style={{ fontFamily: 'var(--FH)', fontSize: '14px', fontWeight: 900, color: 'var(--DARK)', marginBottom: '3px' }}>
                           {b.city}
                        </div>

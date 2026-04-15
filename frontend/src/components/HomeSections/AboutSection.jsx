@@ -24,9 +24,10 @@ function AboutSection() {
                 padding: '0',
                 width: '100%',
                 flex: 1,
-                display: 'flex'
+                display: 'flex',
+                backgroundColor: '#0a0a0c'
              }}>
-              <img src="/Aboutuspage.png.JPG" alt="About Laser Experts" style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'cover', display: 'block', borderRadius: '4px' }} />
+              <img src="/Aboutuspage.png.JPG" alt="About Laser Experts" style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'contain', display: 'block', borderRadius: '4px' }} />
             </div>
             <div className="ab-yr">
               <div className="n">2017</div>
