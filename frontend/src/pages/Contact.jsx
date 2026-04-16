@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-/* ─── Branch data with verified addresses and direct search links �const BRANCHES = [
+/* Branch data with verified addresses and direct search links */
+const BRANCHES = [
   {
     city: 'HOSUR (HQ)',
     addr: 'H149, TNHB Phase 9, Hosur, Tamil Nadu 635109',
@@ -67,9 +68,6 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
     textColor: '#0A0A0C',
     x: 60, y: 268,
     mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Ajman+UAE/'
-  }
-];
-aser+Experts+India+Ajman+UAE/'
   }
 ];
 
