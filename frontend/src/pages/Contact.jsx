@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-/* Branch data with verified addresses and direct search links */
+/* ─── Branch data with verified addresses and direct search links ─── */
 const BRANCHES = [
   {
     city: 'HOSUR (HQ)',
-    addr: 'H149, TNHB Phase 9, Hosur, Tamil Nadu 635109',
+    addr: 'H149, TNHB Phase 9, Krishnagiri, Hosur, Tamil Nadu 635109',
     emoji: '🏭',
     color: '#FFEF00',
     textColor: '#0A0A0C',
@@ -17,8 +17,8 @@ const BRANCHES = [
   },
   {
     city: 'CHENNAI',
-    addr: 'Ambattur Industrial Estate, Chennai, Tamil Nadu 600053',
-    emoji: '🎢',
+    addr: 'No. 66, Ramapuram, Ambattur, Chennai, Tamil Nadu 600053',
+    emoji: '🎡',
     color: '#FFEF00',
     textColor: '#0A0A0C',
     x: 252, y: 468,
@@ -26,7 +26,7 @@ const BRANCHES = [
   },
   {
     city: 'BANGALORE',
-    addr: 'Peenya Industrial Area, Bangalore, Karnataka 560058',
+    addr: 'No. 87, Peenya Industrial Area Phase 3, Bangalore 560058',
     emoji: '🏛️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
@@ -35,7 +35,7 @@ const BRANCHES = [
   },
   {
     city: 'HYDERABAD',
-    addr: 'Medchal Industrial Area, Hyderabad, Telangana 500039',
+    addr: 'Plot No. 50, Chengicheria Village, Medchal-Malkajgiri, Hyderabad 500039',
     emoji: '🕌',
     color: '#FFEF00',
     textColor: '#0A0A0C',
@@ -44,7 +44,7 @@ const BRANCHES = [
   },
   {
     city: 'PUNE',
-    addr: 'Pimpri-Chinchwad, Pune, Maharashtra',
+    addr: 'Pimpri-Chinchwad Industrial Area, Pune, Maharashtra',
     emoji: '🏰',
     color: '#FFEF00',
     textColor: '#0A0A0C',
@@ -53,7 +53,7 @@ const BRANCHES = [
   },
   {
     city: 'DELHI / NCR',
-    addr: 'Okhla Industrial Estate, New Delhi 110020',
+    addr: 'Okhla Industrial Area, New Delhi 110020',
     emoji: '⛩️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
@@ -62,7 +62,7 @@ const BRANCHES = [
   },
   {
     city: 'UAE',
-    addr: 'Office No. 152, Ajman, UAE',
+    addr: 'Office No. 152, Masfout, Ajman, UAE 33139',
     emoji: '🏙️',
     color: '#FFEF00',
     textColor: '#0A0A0C',
