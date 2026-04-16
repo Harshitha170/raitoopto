@@ -303,6 +303,12 @@ nav.scrolled{box-shadow:0 4px 24px rgba(0,0,0,0.1)}
 .ncta{background:var(--DARK);color:var(--Y) !important;font-weight:900;text-transform:uppercase;padding:12px 25px;border-radius:2px;font-size:12px;transition:all 0.3s;letter-spacing:1px;border:none;cursor:pointer}
 .ncta:hover{background:var(--Y);color:var(--DARK) !important}
 
+/* BLACK NAV THEME (Admin) */
+.admin-nav-black { background: #000 !important; border-color: #222 !important; }
+.admin-nav-black .nlinks a { color: rgba(255,255,255,0.7) !important; }
+.admin-nav-black .nlinks a:hover, .admin-nav-black .nlinks a.active { color: #fff !important; background: rgba(255,255,255,0.1) !important; }
+.admin-nav-black .ham span { background: #fff !important; }
+
 /* FOOTER SOCIAL HOVER FIX */
 .ft-soc{width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
 .ft-soc:hover{background:var(--Y) !important;transform:scale(1.2);border-color:var(--Y) !important}

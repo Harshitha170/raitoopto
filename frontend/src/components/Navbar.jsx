@@ -66,14 +66,14 @@ function Navbar() {
       )}
 
       {/* NAVBAR */}
-      <nav className={`n ${isSticky ? "sticky" : ""}`}>
+      <nav className={`n ${isSticky ? "sticky" : ""} ${location.pathname.startsWith('/admin') ? "admin-nav-black" : ""}`} style={location.pathname.startsWith('/admin') ? { background: "#000", color: "#fff", borderBottom: "1px solid #333" } : {}}>
         <div className="wrap ni">
           <Link to="/" className="nl" onClick={closeMenu}>
              <img src={logo} alt="Laser Experts Logo" style={{ height: "60px", width: "auto" }} />
-             <div className="nlogo-txt" style={{ color: "var(--DARK)", fontWeight: 800, fontSize: "20px", lineHeight: 1 }}>{t('brand.name')}<br/><small style={{ fontSize: "10px", letterSpacing: "2px", opacity: 0.7 }}>{t('brand.tagline')}</small></div>
+             <div className="nlogo-txt" style={{ color: location.pathname.startsWith('/admin') ? "#fff" : "var(--DARK)", fontWeight: 800, fontSize: "20px", lineHeight: 1 }}>{t('brand.name')}<br/><small style={{ fontSize: "10px", letterSpacing: "2px", opacity: 0.7, color: location.pathname.startsWith('/admin') ? "var(--Y)" : "inherit" }}>{t('brand.tagline')}</small></div>
           </Link>
 
-          <ul className="nlinks">
+          <ul className={`nlinks ${location.pathname.startsWith('/admin') ? "admin-links-white" : ""}`}>
             <li><Link to="/" className={isActive("/")} onClick={closeMenu}>{t('nav.home')}</Link></li>
             <li><Link to="/about" className={isActive("/about")} onClick={closeMenu}>{t('nav.about')}</Link></li>
             <li className="has-d">
