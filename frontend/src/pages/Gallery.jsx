@@ -10,7 +10,7 @@ const getFullUrl = (url) => {
   
   // If it's a relative path or a hardcoded localhost path from previous DB entries
   // we clean it up to use the current API_BASE_URL
-  const cleanPath = url.replace(/^https?:\/\/[^\/]+\//, '').replace(/^\//, '');
+  const cleanPath = url.replace(/^https?:\/\/[^/]+\//, '').replace(/^\//, '');
   return `${API_BASE_URL}/${cleanPath}`;
 };
 
@@ -45,6 +45,7 @@ function Lightbox({ items, initialIndex, onClose }) {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose, index]);
 
   if (!item) return null;

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import logo from "../assets/logo.jpg";
-import { services } from "../data/siteData";
 
 const SOCIAL_LINKS = {
   facebook: "https://www.facebook.com/laserexpertsindia",

@@ -5,59 +5,6 @@ import AboutSection from '../components/HomeSections/AboutSection';
 import Stats from '../components/HomeSections/Stats';
 
 /* ─── Static video with custom audio controls ─── */
-function ProcessVideo() {
-  const videoRef = useRef(null);
-  const [isMuted, setIsMuted] = useState(true);
-
-  const toggleMute = (e) => {
-    e.stopPropagation();
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  return (
-    <div
-      className="process-video-container"
-      style={{
-        borderRadius: '12px', overflow: 'hidden',
-        backgroundColor: '#000', position: 'relative',
-        boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
-        width: '100%', height: '100%', display: 'flex', flexDirection: 'column'
-      }}
-    >
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted={isMuted}
-        playsInline
-        preload="auto"
-        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', minHeight: 'auto' }}
-      >
-        <source src="/process-video.mp4" type="video/mp4" />
-      </video>
-      
-      {/* Audio Toggle Button */}
-      <button 
-        onClick={toggleMute}
-        style={{
-          position: 'absolute', bottom: '15px', right: '15px',
-          background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.2)',
-          color: '#fff', padding: '8px 16px', borderRadius: '20px',
-          cursor: 'pointer', fontFamily: 'var(--FH)', fontSize: '10px',
-          letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '6px',
-          backdropFilter: 'blur(5px)', transition: 'background 0.3s'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--Y)'}
-        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
-      >
-        {isMuted ? '🔇 AUDIO OFF' : '🔊 AUDIO ON'}
-      </button>
-    </div>
-  );
-}
 
 function Roadmap() {
   const { t } = useTranslation();
@@ -247,6 +194,7 @@ function VideoSection() {
 
     if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleMute = () => {
@@ -326,16 +274,6 @@ function VideoSection() {
 function About() {
 
   const { t } = useTranslation();
-  const [isMuted, setIsMuted] = useState(true);
-  const videoRef = useRef(null);
-
-  const toggleAudio = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
-  };
-
   return (
     <div className="about-page">
       {/* Page Hero */}

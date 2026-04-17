@@ -3,20 +3,6 @@ import { Link } from "react-router-dom";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-const JOB_ICONS = {
-  default: "🔧",
-  laser: "⚡",
-  engineer: "⚙️",
-  technician: "🛠️",
-  manager: "📋",
-  sales: "💼",
-  software: "💻",
-  automation: "🤖",
-  cnc: "🏭",
-  fiber: "🔦",
-  service: "🔩",
-  field: "📍"
-};
 
 function getJobIcon(title) {
   const t = (title || "").toLowerCase();

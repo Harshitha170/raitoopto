@@ -2,12 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-const METRICS = [
-  { value: '4000+', keyLabel: 'about.metric1', fallback: 'Machines Serviced', delay: '0s' },
-  { value: '40+ Yrs', keyLabel: 'about.metric2', fallback: 'CNC Experience', delay: '0.1s' },
-  { value: '98%', keyLabel: 'about.metric3', fallback: 'Repeat Customers', delay: '0.2s' },
-  { value: '3+', keyLabel: 'about.metric4', fallback: 'Service Branches', delay: '0.3s' },
-];
+// const METRICS = [
+//   { value: '4000+', keyLabel: 'about.metric1', fallback: 'Machines Serviced', delay: '0s' },
+//   { value: '40+ Yrs', keyLabel: 'about.metric2', fallback: 'CNC Experience', delay: '0.1s' },
+//   { value: '98%', keyLabel: 'about.metric3', fallback: 'Repeat Customers', delay: '0.2s' },
+//   { value: '3+', keyLabel: 'about.metric4', fallback: 'Service Branches', delay: '0.3s' },
+// ];
 
 function AboutSection() {
   const { t } = useTranslation();

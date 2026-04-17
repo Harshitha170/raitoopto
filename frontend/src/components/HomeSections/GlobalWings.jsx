@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { network } from "../../data/siteData";
 
 function GlobalWings() {
-  const { t } = useTranslation();
   const wings = network;
 
   return (
