@@ -407,22 +407,22 @@ function Admin() {
     <div className="admin-portal" style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", color: "#333", fontFamily: "'Inter', sans-serif" }}>
       
       {/* NAVBAR: BLACK CASE */}
-      <nav style={{ background: "#000", color: "#fff", position: "sticky", top: 0, zIndex: 1000, boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
+      <nav style={{ background: "#111", color: "#fff", position: "sticky", top: 0, zIndex: 1000, boxShadow: "0 4px 20px rgba(0,0,0,0.1)", borderBottom: "2px solid #e3c19b" }}>
         <div className="wrap" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: "70px", padding: "0 30px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "none", border: "none", color: "#fff", fontSize: "20px", cursor: "pointer", opacity: 0.8 }}><i className="fas fa-bars"></i></button>
-            <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "#fff" }}>
-               <div style={{ fontSize: "20px", fontWeight: "900", color: "#e3c19b" }}>RT</div>
-               <span style={{ fontSize: "14px", fontWeight: "800", letterSpacing: "1px", textTransform: "uppercase" }}>Console</span>
+            <button onClick={() => setSidebarOpen(true)} style={{ background: "rgba(255,255,255,0.05)", border: "none", color: "#fff", width: "40px", height: "40px", borderRadius: "10px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="fas fa-bars"></i></button>
+            <Link to="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none", color: "#fff" }}>
+               <div style={{ fontSize: "22px", fontWeight: "900", color: "#e3c19b", letterSpacing: "1px" }}>RAITOOPTO</div>
+               <div style={{ padding: "4px 8px", background: "#e3c19b", borderRadius: "4px", color: "#000", fontSize: "10px", fontWeight: "900" }}>ADMIN</div>
             </Link>
           </div>
           
           <div style={{ display: "flex", alignItems: "center", gap: "25px" }}>
-             <div className="nav-date" style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "1px" }}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-             <div style={{ height: "30px", width: "1px", background: "rgba(255,255,255,0.1)" }}></div>
+             <div className="nav-date" style={{ fontSize: "12px", fontWeight: 800, color: "rgba(255,255,255,0.4)", letterSpacing: "1px" }}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</div>
+             <div style={{ height: "24px", width: "1px", background: "rgba(255,255,255,0.1)" }}></div>
              <div style={{ position: "relative" }}>
-                <button onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "8px 15px", borderRadius: "100px", fontSize: "14px", cursor: "pointer", display: "flex", alignItems: "center", gap: "10px" }}>
-                   <i className="fas fa-user-circle" style={{ fontSize: "18px", color: "#e3c19b" }}></i>
+                <button onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "8px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "10px" }}>
+                   <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "#e3c19b", color: "#000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 900 }}>A</div>
                    Admin
                    <i className={`fas fa-chevron-${profileDropdownOpen ? 'up' : 'down'}`} style={{ fontSize: "10px", opacity: 0.5 }}></i>
                 </button>
@@ -464,14 +464,14 @@ function Admin() {
          <nav style={{ flex: 1, padding: "20px 0" }}>
             {[
                { id: 'dashboard', icon: 'fas fa-th-large', label: 'Dashboard' },
-               { id: 'blogs', icon: 'fas fa-newspaper', label: 'Company News' },
-               { id: 'gallery', icon: 'fas fa-images', label: 'Media Library' },
-               { id: 'students', icon: 'fas fa-users', label: 'Candidates' },
+               { id: 'blogs', icon: 'fas fa-newspaper', label: 'Blogs' },
+               { id: 'gallery', icon: 'fas fa-images', label: 'Gallery' },
+               { id: 'students', icon: 'fas fa-users', label: 'Applications' },
                { id: 'ats', icon: 'fas fa-chart-bar', label: 'ATS Ranking' },
-               { id: 'jobs', icon: 'fas fa-briefcase', label: 'Recruitment' }
+               { id: 'jobs', icon: 'fas fa-briefcase', label: 'Test management' }
             ].map(item => (
               <button key={item.id} onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }} className={`sidebar-item-lite ${activeTab === item.id ? 'active' : ''}`}>
-                 <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: activeTab === item.id ? "#c19b6c" : "#f5f5f5", display: "flex", align_items: "center", justifyContent: "center", color: activeTab === item.id ? "#fff" : "#999" }}>
+                 <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: activeTab === item.id ? "#c19b6c" : "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", color: activeTab === item.id ? "#fff" : "#999" }}>
                    <i className={item.icon} style={{ fontSize: "14px" }}></i>
                  </div>
                  {item.label}
@@ -494,7 +494,7 @@ function Admin() {
 
            {(error || success) && (
               <div style={{ 
-                padding: "15px 25px", borderRadius: "12px", marginBottom: "30px", display: "flex", align_items: "center", gap: "15px",
+                padding: "15px 25px", borderRadius: "12px", marginBottom: "30px", display: "flex", alignItems: "center", gap: "15px",
                 background: error ? "#fff5f5" : "#f0fff4", color: error ? "#e03131" : "#2f9e44", border: `1px solid ${error ? '#ffc9c9' : '#b2f2bb'}`
               }}>
                 <i className={`fas fa-${error ? 'exclamation-circle' : 'check-circle'}`}></i> {error || success}
@@ -506,17 +506,17 @@ function Admin() {
              <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "30px" }}>
                    {[
-                     { label: 'Total Applicants', val: students.length, icon: 'fas fa-users', bg: '#eef2ff', color: '#6366f1' },
-                     { label: 'Published News', val: blogs.length, icon: 'fas fa-newspaper', bg: '#fdf4ff', color: '#d946ef' },
-                     { label: 'Media Assets', val: gallery.length, icon: 'fas fa-images', bg: '#f0fdf4', color: '#22c55e' },
-                     { label: 'Active Roles', val: jobs.length, icon: 'fas fa-briefcase', bg: '#fff7ed', color: '#f97316' }
+                     { label: 'Applications', val: students.length, icon: 'fas fa-users', bg: '#e0f2fe', color: '#0369a1' },
+                     { label: 'Blogs', val: blogs.length, icon: 'fas fa-newspaper', bg: '#f1f5f9', color: '#15803d' },
+                     { label: 'Gallery', val: gallery.length, icon: 'fas fa-images', bg: '#f1f5f9', color: '#475569' },
+                     { label: 'Tests', val: jobs.length, icon: 'fas fa-briefcase', bg: '#fff7ed', color: '#f97316' }
                    ].map((stat, i) => (
-                     <div key={i} className="admin-card" style={{ display: "flex", justifyContent: "space-between", align_items: "center" }}>
+                     <div key={i} className="admin-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div>
                            <div style={{ fontSize: "13px", color: "#666", fontWeight: 600, marginBottom: "8px" }}>{stat.label}</div>
                            <div style={{ fontSize: "32px", fontWeight: 900 }}>{stat.val}</div>
                         </div>
-                        <div style={{ width: "60px", height: "60px", background: stat.bg, borderRadius: "16px", display: "flex", align_items: "center", justifyContent: "center", color: stat.color, fontSize: "22px" }}>
+                        <div style={{ width: "60px", height: "60px", background: stat.bg, borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: stat.color, fontSize: "22px" }}>
                            <i className={stat.icon}></i>
                         </div>
                      </div>
@@ -525,15 +525,15 @@ function Admin() {
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: "30px" }}>
                    <div className="admin-card">
-                      <div style={{ display: "flex", justifyContent: "space-between", align_items: "center", marginBottom: "25px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
                          <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 800 }}>Recent Activity</h3>
                          <button onClick={() => setActiveTab('students')} style={{ background: "none", border: "none", color: "#c19b6c", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}>View All</button>
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
                          {students.slice(0, 5).map(s => (
-                           <div key={s._id} style={{ display: "flex", justifyContent: "space-between", align_items: "center", padding: "15px", background: "#f9f9f9", borderRadius: "12px" }}>
-                              <div style={{ display: "flex", align_items: "center", gap: "15px" }}>
-                                 <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#fff", border: "1.5px solid #eee", fontSize: "14px", display: "flex", align_items: "center", justifyContent: "center" }}>{s.name[0]}</div>
+                           <div key={s._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px", background: "#f9f9f9", borderRadius: "12px" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+                                 <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#fff", border: "1.5px solid #eee", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center" }}>{s.name[0]}</div>
                                  <div>
                                     <div style={{ fontSize: "14px", fontWeight: 800 }}>{s.name}</div>
                                     <div style={{ fontSize: "11px", color: "#999" }}>Applied for {s.appliedRole}</div>
@@ -579,7 +579,7 @@ function Admin() {
                        <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Detailed Content</label>
                        <textarea value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })} className="input-lite" style={{ height: "250px", resize: "none" }} placeholder="Describe the news or update..." />
                      </div>
-                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "25px", align_items: "end" }}>
+                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "25px", alignItems: "end" }}>
                         <div>
                           <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Cover Media</label>
                           <input type="file" onChange={e => setBlogPoster(e.target.files[0])} style={{ width: "100%", padding: "12px", border: "1.5px dashed #ccc", borderRadius: "12px", fontSize: "13px" }} />
@@ -621,7 +621,7 @@ function Admin() {
                    <h3 style={{ fontSize: "18px", fontWeight: 800, marginBottom: "20px" }}>Storage Segments</h3>
                    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
                       {categories.map((c, i) => (
-                        <div key={i} style={{ padding: "8px 18px", borderRadius: "100px", background: "#f8f9fa", border: "1.5px solid #eee", fontSize: "13px", fontWeight: 700, display: "flex", align_items: "center", gap: "10px" }}>
+                        <div key={i} style={{ padding: "8px 18px", borderRadius: "100px", background: "#f8f9fa", border: "1.5px solid #eee", fontSize: "13px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px" }}>
                            {c} <button onClick={() => handleDeleteCategory(c)} style={{ border: "none", background: "none", color: "#999", cursor: "pointer", fontSize: "16px" }}>×</button>
                         </div>
                       ))}
@@ -630,7 +630,7 @@ function Admin() {
                 </div>
 
                 <div className="admin-card">
-                   <div style={{ display: "flex", justifyContent: "space-between", align_items: "center", marginBottom: "35px", flexWrap: "wrap", gap: "20px" }}>
+                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "35px", flexWrap: "wrap", gap: "20px" }}>
                       <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 800 }}>Asset Repository</h3>
                       <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
                          <input type="text" placeholder="Caption" className="input-lite" style={{ width: "200px" }} value={galleryForm.caption} onChange={e => setGalleryForm({...galleryForm, caption: e.target.value})} />
@@ -660,7 +660,7 @@ function Admin() {
            {/* CANDIDATES TABLE */}
            {activeTab === 'students' && (
              <div className="admin-card">
-                <div style={{ display: "flex", justifyContent: "space-between", align_items: "center", marginBottom: "30px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
                    <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 800 }}>Applicant Database</h3>
                 </div>
                 <div style={{ overflowX: "auto" }}>
@@ -769,8 +769,8 @@ function Admin() {
 
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "25px" }}>
                      {jobs.map(j => (
-                       <div key={j._id} className="admin-card" style={{ borderLeft: `5px solid ${j.status === 'Published' ? '#22c55e' : '#ff922b'}` }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", align_items: "center", marginBottom: "15px" }}>
+                       <div key={j._id} className="admin-card" style={{ borderLeft: `5px solid ${j.status === 'Published' ? '#475569' : '#ff922b'}` }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
                              <h4 style={{ margin: 0, fontSize: "18px", fontWeight: 800 }}>{j.title}</h4>
                              <span style={{ fontSize: "10px", padding: "4px 10px", borderRadius: "100px", background: "#f8f9fa", fontWeight: 800 }}>{j.status}</span>
                           </div>
