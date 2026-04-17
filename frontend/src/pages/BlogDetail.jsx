@@ -36,7 +36,6 @@ function BlogDetail() {
     <div style={{ minHeight: "100vh", background: "#0c0c0e", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
       <h2 style={{ fontFamily: "Orbitron" }}>Post Not Found</h2>
       <Link to="/blogs" style={{ color: "var(--Y)", marginTop: "20px" }}>Back to News</Link>
-      <FooterSection />
     </div>
   );
 
@@ -75,7 +74,6 @@ function BlogDetail() {
            </div>
         </div>
       </section>
-      <FooterSection />
     </div>
   );
 }

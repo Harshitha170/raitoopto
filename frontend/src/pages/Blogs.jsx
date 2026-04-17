@@ -88,7 +88,6 @@ function Blogs() {
         </div>
       </section>
 
-      <FooterSection />
     </div>
   );
 }
