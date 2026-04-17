@@ -22,7 +22,7 @@ const BRANCHES = [
     color: '#FFEF00',
     textColor: '#0A0A0C',
     x: 252, y: 468,
-    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+Ambattur+Chennai/'
+    mapLink: 'https://www.google.com/maps/search/Laser+Experts+India+LLP+Ambattur+Chennai/'
   },
   {
     city: 'BANGALORE',
