@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import FooterSection from "../components/FooterSection";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -90,7 +90,7 @@ function Blogs() {
         </div>
       </section>
 
-      <Footer />
+      <FooterSection />
     </div>
   );
 }

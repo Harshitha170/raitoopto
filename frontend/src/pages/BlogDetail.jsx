@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import FooterSection from "../components/FooterSection";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -38,7 +38,7 @@ function BlogDetail() {
       <Navbar />
       <h2 style={{ fontFamily: "Orbitron" }}>Post Not Found</h2>
       <Link to="/blogs" style={{ color: "var(--Y)", marginTop: "20px" }}>Back to News</Link>
-      <Footer />
+      <FooterSection />
     </div>
   );
 
@@ -78,7 +78,7 @@ function BlogDetail() {
            </div>
         </div>
       </section>
-      <Footer />
+      <FooterSection />
     </div>
   );
 }
