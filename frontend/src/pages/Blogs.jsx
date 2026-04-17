@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
 import FooterSection from "../components/FooterSection";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
@@ -33,7 +32,6 @@ function Blogs() {
 
   return (
     <div className="blogs-page" style={{ minHeight: "100vh", background: "#0c0c0e", color: "#fff" }}>
-      <Navbar />
       
       {/* Hero Section */}
       <section style={{ padding: "120px 0 80px", background: "linear-gradient(180deg, rgba(255,239,0,0.05) 0%, rgba(12,12,14,0) 100%)", textAlign: "center" }}>

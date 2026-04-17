@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { useParams, Link } from "react-router-dom";
 import FooterSection from "../components/FooterSection";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
@@ -35,7 +35,6 @@ function BlogDetail() {
 
   if (!blog) return (
     <div style={{ minHeight: "100vh", background: "#0c0c0e", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-      <Navbar />
       <h2 style={{ fontFamily: "Orbitron" }}>Post Not Found</h2>
       <Link to="/blogs" style={{ color: "var(--Y)", marginTop: "20px" }}>Back to News</Link>
       <FooterSection />
@@ -44,7 +43,6 @@ function BlogDetail() {
 
   return (
     <div className="blog-detail-page" style={{ minHeight: "100vh", background: "#0c0c0e", color: "#fff" }}>
-      <Navbar />
       <section style={{ padding: "120px 0 80px" }}>
         <div className="wrap" style={{ maxWidth: "900px" }}>
            <Link to="/blogs" style={{ color: "var(--Y)", textDecoration: "none", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", marginBottom: "30px" }}>

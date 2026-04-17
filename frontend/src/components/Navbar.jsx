@@ -65,54 +65,56 @@ function Navbar() {
       )}
 
       {/* NAVBAR */}
-      <nav className={`n ${isSticky ? "sticky" : ""}`}>
-        <div className="wrap ni">
-          <Link to="/" className="nl" onClick={closeMenu}>
-             <img src={logo} alt="Laser Experts Logo" style={{ height: "60px", width: "auto" }} />
-             <div className="nlogo-txt" style={{ color: "var(--DARK)", fontWeight: 800, fontSize: "20px", lineHeight: 1 }}>{t('brand.name')}<br/><small style={{ fontSize: "10px", letterSpacing: "2px", opacity: 0.7 }}>{t('brand.tagline')}</small></div>
-          </Link>
+      {!location.pathname.startsWith('/admin') && (
+        <nav className={`n ${isSticky ? "sticky" : ""}`}>
+          <div className="wrap ni">
+            <Link to="/" className="nl" onClick={closeMenu}>
+               <img src={logo} alt="Laser Experts Logo" style={{ height: "60px", width: "auto" }} />
+               <div className="nlogo-txt" style={{ color: "var(--DARK)", fontWeight: 800, fontSize: "20px", lineHeight: 1 }}>{t('brand.name')}<br/><small style={{ fontSize: "10px", letterSpacing: "2px", opacity: 0.7 }}>{t('brand.tagline')}</small></div>
+            </Link>
 
-          <ul className="nlinks">
-            <li><Link to="/" className={isActive("/")} onClick={closeMenu}>{t('nav.home')}</Link></li>
-            <li><Link to="/about" className={isActive("/about")} onClick={closeMenu}>{t('nav.about')}</Link></li>
-            <li className="has-d">
-              <Link to="/services" className={isActive("/services") || location.pathname.includes('/services/') ? "active" : ""} onClick={closeMenu} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                {t('nav.services')}
-                <svg viewBox="0 0 24 24" style={{ width: "12px", height: "12px", fill: "currentColor" }}><path d="M7 10l5 5 5-5z"/></svg>
-              </Link>
-              <ul className="ndrop">
-                <li><Link to="/services" onClick={closeMenu}>{t('nav.specialized', 'ALL SERVICES')}</Link></li>
-                <li><Link to="/services/field-service" onClick={closeMenu}>{t('services.field-service.title', 'FIELD SERVICES')}</Link></li>
-                <li><Link to="/services/amc" onClick={closeMenu}>{t('services.amc.title', 'AMC CONTRACTS')}</Link></li>
-                <li><Link to="/services/spares" onClick={closeMenu}>{t('services.spares.title', 'SPARES AND CONSUMABLES')}</Link></li>
-              </ul>
-            </li>
-            <li className="has-d">
-              <Link to="/repairs/remanufacturing" className={isActive("/repairs/remanufacturing") || location.pathname.includes('/repairs/') ? "active" : ""} onClick={closeMenu} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                REPAIRS
-                <svg viewBox="0 0 24 24" style={{ width: "12px", height: "12px", fill: "currentColor" }}><path d="M7 10l5 5 5-5z"/></svg>
-              </Link>
-              <ul className="ndrop" style={{ minWidth: '240px' }}>
-                <li><Link to="/repairs/turbo-blowers" onClick={closeMenu}>TURBO BLOWERS</Link></li>
-                <li><Link to="/repairs/fanuc-pump" onClick={closeMenu}>FANUC VACUUM PUMP</Link></li>
-                <li><Link to="/repairs/adaptive-optics" onClick={closeMenu}>ADAPTIVE OPTICS</Link></li>
-                <li><Link to="/services/internal-oem" onClick={closeMenu}>INTERNAL AND OEM</Link></li>
-                <li><Link to="/repairs/remanufacturing" onClick={closeMenu}>VIEW ALL SERVICES</Link></li>
-              </ul>
-            </li>
-            <li><Link to="/gallery" className={isActive("/gallery")} onClick={closeMenu}>{t('nav.gallery')}</Link></li>
-            <li><Link to="/career" className={isActive("/career")} onClick={closeMenu}>{t('nav.career')}</Link></li>
-            <li><Link to="/blogs" className={isActive("/blogs")} onClick={closeMenu}>{t('nav.blogs', 'BLOGS')}</Link></li>
-            <li><Link to="/contact" className={isActive("/contact")} onClick={closeMenu}>{t('nav.contact')}</Link></li>
-          </ul>
+            <ul className="nlinks">
+              <li><Link to="/" className={isActive("/")} onClick={closeMenu}>{t('nav.home')}</Link></li>
+              <li><Link to="/about" className={isActive("/about")} onClick={closeMenu}>{t('nav.about')}</Link></li>
+              <li className="has-d">
+                <Link to="/services" className={isActive("/services") || location.pathname.includes('/services/') ? "active" : ""} onClick={closeMenu} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  {t('nav.services')}
+                  <svg viewBox="0 0 24 24" style={{ width: "12px", height: "12px", fill: "currentColor" }}><path d="M7 10l5 5 5-5z"/></svg>
+                </Link>
+                <ul className="ndrop">
+                  <li><Link to="/services" onClick={closeMenu}>{t('nav.specialized', 'ALL SERVICES')}</Link></li>
+                  <li><Link to="/services/field-service" onClick={closeMenu}>{t('services.field-service.title', 'FIELD SERVICES')}</Link></li>
+                  <li><Link to="/services/amc" onClick={closeMenu}>{t('services.amc.title', 'AMC CONTRACTS')}</Link></li>
+                  <li><Link to="/services/spares" onClick={closeMenu}>{t('services.spares.title', 'SPARES AND CONSUMABLES')}</Link></li>
+                </ul>
+              </li>
+              <li className="has-d">
+                <Link to="/repairs/remanufacturing" className={isActive("/repairs/remanufacturing") || location.pathname.includes('/repairs/') ? "active" : ""} onClick={closeMenu} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  REPAIRS
+                  <svg viewBox="0 0 24 24" style={{ width: "12px", height: "12px", fill: "currentColor" }}><path d="M7 10l5 5 5-5z"/></svg>
+                </Link>
+                <ul className="ndrop" style={{ minWidth: '240px' }}>
+                  <li><Link to="/repairs/turbo-blowers" onClick={closeMenu}>TURBO BLOWERS</Link></li>
+                  <li><Link to="/repairs/fanuc-pump" onClick={closeMenu}>FANUC VACUUM PUMP</Link></li>
+                  <li><Link to="/repairs/adaptive-optics" onClick={closeMenu}>ADAPTIVE OPTICS</Link></li>
+                  <li><Link to="/services/internal-oem" onClick={closeMenu}>INTERNAL AND OEM</Link></li>
+                  <li><Link to="/repairs/remanufacturing" onClick={closeMenu}>VIEW ALL SERVICES</Link></li>
+                </ul>
+              </li>
+              <li><Link to="/gallery" className={isActive("/gallery")} onClick={closeMenu}>{t('nav.gallery')}</Link></li>
+              <li><Link to="/career" className={isActive("/career")} onClick={closeMenu}>{t('nav.career')}</Link></li>
+              <li><Link to="/blogs" className={isActive("/blogs")} onClick={closeMenu}>{t('nav.blogs', 'BLOGS')}</Link></li>
+              <li><Link to="/contact" className={isActive("/contact")} onClick={closeMenu}>{t('nav.contact')}</Link></li>
+            </ul>
 
-          <Link to="/contact" className="ncta">{t('nav.consult')}</Link>
+            <Link to="/contact" className="ncta">{t('nav.consult')}</Link>
 
-          <button className="ham" onClick={toggleMenu} aria-label="Toggle Menu">
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </nav>
+            <button className="ham" onClick={toggleMenu} aria-label="Toggle Menu">
+              <span></span><span></span><span></span>
+            </button>
+          </div>
+        </nav>
+      )}
 
       {/* MOBILE NAV */}
       <div className={`mnav ${isMenuOpen ? "open" : ""}`}>
