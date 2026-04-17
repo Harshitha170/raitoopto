@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import './Admin.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -446,18 +447,6 @@ function Admin() {
         </div>
       </nav>
 
-      <style>{`
-        .admin-card { background: #fff; border: 1.5px solid #f0f0f0; border-radius: 20px; transition: all 0.3s; padding: 30px; }
-        .admin-card:hover { transform: translateY(-5px); border-color: #e3c19b; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
-        .sidebar-item-lite { width: calc(100% - 20px); margin: 4px 10px; padding: 14px 20px; border: none; background: transparent; color: #333; border-radius: 12px; text-align: left; display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 14px; font-weight: 700; transition: 0.3s; }
-        .sidebar-item-lite.active { background: #fdf8f4; color: #c19b6c; }
-        .btn-lite { padding: 12px 24px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; border: none; }
-        .btn-lite-primary { background: #c19b6c; color: #fff; }
-        .btn-lite-primary:hover { opacity: 0.9; }
-        .input-lite { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #eee; background: #f9f9f9; font-size: 14px; outline: none; transition: 0.3s; }
-        .input-lite:focus { border-color: #e3c19b; background: #fff; }
-        @media (max-width: 768px) { .nav-date { display: none; } }
-      `}</style>
       
       {/* SIDEBAR LITE */}
       {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", zIndex: 1999, backdropFilter: "blur(2px)" }}></div>}
@@ -800,59 +789,6 @@ function Admin() {
       <footer style={{ padding: "40px", textAlign: "center", borderTop: "1.5px solid #f0f0f0", background: "#fff", fontSize: "12px", fontWeight: 700, color: "#999", letterSpacing: "1px" }}>
          &copy; 2026 RAITOOPTO &bull; PROFESSIONAL MANAGEMENT PLATFORM
       </footer>
-        .gal-item-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .preview-row { transition: 0.3s; }
-        .preview-row:hover { border-color: rgba(255,255,255,0.2) !important; background: rgba(255,255,255,0.06) !important; transform: translateX(8px); }
-        
-        @keyframes dropdownFade { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(255,239,0,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,239,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,239,0,0); } }
-
-        .admin-profile-dropdown {
-          position: absolute; top: 100%; right: 0; margin-top: 20px; width: 240px;
-          background: #111116; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
-          box-shadow: 0 25px 50px rgba(0,0,0,0.6); z-index: 2000; overflow: hidden;
-          animation: dropdownFade 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-          backdrop-filter: blur(10px);
-        }
-
-        .admin-card {
-          background: rgba(30, 41, 59, 0.6); padding: 35px; border-radius: 28px; 
-          border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px);
-          box-shadow: 0 10px 40px rgba(0,0,0,0.3); transition: all 0.4s;
-          color: #fff;
-        }
-        .admin-card:hover { border-color: rgba(255,255,255,0.15); }
-
-        .admin-card-header {
-           display: flex; justify-content: space-between; alignItems: center; margin-bottom: 25px;
-           border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 18px;
-        }
-        
-        .admin-stat-card {
-           background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%); 
-           border: 1px solid rgba(255,255,255,0.08); padding: 30px; border-radius: 24px;
-           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-           display: flex; align-items: center; justify-content: space-between;
-           position: relative; overflow: hidden;
-        }
-        .admin-stat-card:hover { 
-          transform: translateY(-8px); 
-          border-color: rgba(255,255,255,0.2);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
-        }
-
-        .btn-dk-v2 {
-          background: rgba(255,255,255,0.03); color: #fff; border: 1px solid rgba(255,255,255,0.1);
-          padding: 12px 24px; borderRadius: 12px; fontWeight: 800; cursor: pointer; transition: 0.3s;
-        }
-        .btn-dk-v2:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0c0c0e; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-      `}</style>
     </div>
   );
 }
