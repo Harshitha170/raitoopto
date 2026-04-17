@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const SOCIAL_LINKS = {
@@ -11,6 +11,11 @@ const SOCIAL_LINKS = {
 
 function FooterSection() {
   const { t } = useTranslation();
+  const location = useLocation();
+
+  if (location.pathname.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <footer style={{ background: "#0A0A0C", padding: "80px 0 0", borderTop: "1px solid rgba(255,239,0,0.15)" }}>
