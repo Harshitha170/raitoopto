@@ -54,10 +54,10 @@ function Navbar() {
                 <span className={currentLang === 'AR' ? 'active' : ''} onClick={() => changeLang('ar')}>AR</span>
               </div>
               <div className="tp-socs">
-                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
-                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
-                <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
-                <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i className="fab fa-youtube"></i></a>
+                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="https://www.facebook.com/leibglr" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
+                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="https://www.instagram.com/laser_expert" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
+                <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="https://www.linkedin.com/company/laserexpertsindia-com/" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
+                <a href={SOCIAL_LINKS.youtube} target="_blank" rel="https://www.youtube.com/@laserexperts-servicefirst1778" aria-label="YouTube"><i className="fab fa-youtube"></i></a>
               </div>
             </div>
           </div>
