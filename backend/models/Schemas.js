@@ -5,7 +5,9 @@ const bcrypt = require('bcryptjs');
 const AdminSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  email: { type: String, required: true }
+  email: { type: String, required: true },
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date }
 });
 
 // Single Admin Check (Middleware to prevent more than one admin)
@@ -21,6 +23,17 @@ AdminSchema.pre('save', async function(next) {
 });
 
 const Admin = mongoose.model('Admin', AdminSchema);
+
+// --- BLOG SCHEMA ---
+const BlogSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  imageUrl: { type: String },
+  date: { type: Date, default: Date.now },
+  author: { type: String, default: 'Admin' }
+});
+
+const Blog = mongoose.model('Blog', BlogSchema);
 
 // --- STUDENT SCHEMA ---
 const StudentSchema = new mongoose.Schema({
@@ -90,4 +103,4 @@ const JobQuestionSchema = new mongoose.Schema({
 
 const JobQuestion = mongoose.model('JobQuestion', JobQuestionSchema);
 
-module.exports = { Admin, Student, Gallery, JobRole, JobQuestion, Category };
+module.exports = { Admin, Blog, Student, Gallery, JobRole, JobQuestion, Category };

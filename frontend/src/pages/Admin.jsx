@@ -25,6 +25,11 @@ function Admin() {
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [students, setStudents] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [blogs, setBlogs] = useState([]);
+  const [blogForm, setBlogForm] = useState({ title: "", content: "" });
+  const [blogPoster, setBlogPoster] = useState(null);
+  const [editingBlogId, setEditingBlogId] = useState(null);
+  
   const [jobForm, setJobForm] = useState({ title: "", description: "", responsibilities: "", skills: "", minExperience: 0, maxExperience: 0, status: 'Published' });
   const [jdFile, setJdFile] = useState(null);
   const [activeJobId, setActiveJobId] = useState(null); 
@@ -44,6 +49,10 @@ function Admin() {
   const [success, setSuccess] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+  // Forgot Password States
+  const [authMode, setAuthMode] = useState("login"); // 'login' or 'forgot'
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const navigate = useNavigate();
   const { i18n } = useTranslation();
@@ -84,8 +93,29 @@ function Admin() {
         setError(res.message || "Authentication failed.");
       }
     } catch (err) {
-      setError(`CRITICAL: Server unreachable at ${API_BASE_URL}. If this is NOT localhost:5000, ensure you have set REACT_APP_API_URL in Netlify Settings -> Environment Variables and triggered a RE-DEPLOY. If it is high-load, please wait 60s for Render to wake up.`);
+      setError(`CRITICAL: Server unreachable. Check backend status.`);
     }
+    setLoading(false);
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const resp = await fetch(`${API_BASE_URL}/api/admin/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const res = await resp.json();
+      if (resp.ok) {
+        setSuccess("Password reset link sent to your email!");
+        setAuthMode("login");
+      } else {
+        setError(res.message);
+      }
+    } catch (err) { setError("Failed to send reset link."); }
     setLoading(false);
   };
 
@@ -121,10 +151,54 @@ function Admin() {
       if (Array.isArray(cRes)) {
         setCategories(cRes.map(c => c.name));
       }
+
+      const bResp = await fetch(`${API_BASE_URL}/api/blogs`);
+      const bData = await bResp.json();
+      if (Array.isArray(bData)) setBlogs(bData);
+
     } catch (err) {
-      setError("Data fetch failed. Backend may be offline.");
+      console.error(err);
     }
     setLoading(false);
+  };
+
+  // --- BLOG HANDLERS ---
+  const handleBlogSubmit = async () => {
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append("title", blogForm.title);
+      fd.append("content", blogForm.content);
+      if (blogPoster) fd.append("poster", blogPoster);
+
+      const url = editingBlogId 
+        ? `${API_BASE_URL}/api/admin/blogs/${editingBlogId}` 
+        : `${API_BASE_URL}/api/admin/blogs`;
+      
+      const resp = await fetch(url, {
+        method: editingBlogId ? "PUT" : "POST",
+        headers: { "x-auth-token": token },
+        body: fd
+      });
+
+      if (resp.ok) {
+        setSuccess(editingBlogId ? "Blog updated!" : "Blog published!");
+        setBlogForm({ title: "", content: "" });
+        setBlogPoster(null);
+        setEditingBlogId(null);
+        fetchData();
+      }
+    } catch (err) { setError("Blog operation failed."); }
+    setLoading(false);
+  };
+
+  const deleteBlog = async (id) => {
+    if (!window.confirm("Delete this blog post?")) return;
+    await fetch(`${API_BASE_URL}/api/admin/blogs/${id}`, { 
+      method: "DELETE", 
+      headers: { "x-auth-token": token } 
+    });
+    fetchData();
   };
 
   const handleGalleryUpload = async () => {
@@ -181,7 +255,7 @@ function Admin() {
   };
 
   const handleDeleteCategory = async (catName) => {
-    if (!window.confirm(`Delete category "${catName}" and its associations?`)) return;
+    if (!window.confirm(`Delete category "${catName}"?`)) return;
     try {
       const resp = await fetch(`${API_BASE_URL}/api/admin/categories/${encodeURIComponent(catName)}`, {
         method: "DELETE",
@@ -189,7 +263,6 @@ function Admin() {
       });
       if (resp.ok) {
         setSuccess("Category removed.");
-        setTimeout(() => setSuccess(""), 5000);
         fetchData();
       }
     } catch (err) { setError("Failed to delete category."); }
@@ -208,39 +281,57 @@ function Admin() {
       fetchData();
   };
 
-  // LOGIN PAGE REMAINS AS PER EXACT SPECS
+  // --- LOGIN PAGE ---
   if (!isLoggedIn) {
       return (
-        <div className="admin-login-root" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f5f6f7", fontFamily: "'Inter', sans-serif" }}>
+        <div className="admin-login-root" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#0c0c0e", fontFamily: "'Inter', sans-serif", color: "#fff" }}>
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
-            <div className="login-form-card" style={{ width: "100%", maxWidth: "380px", background: "#fff", padding: "30px", borderRadius: "10px", boxShadow: "0 15px 35px rgba(0,0,0,0.06)", border: "1px solid #eee" }}>
-               <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                  <div style={{ margin: "0 auto 15px", width: "40px", height: "40px" }}>
-                    <svg viewBox="0 0 24 24" fill="var(--Y)"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+            <div className="login-form-card" style={{ width: "100%", maxWidth: "420px", background: "#151518", padding: "40px", borderRadius: "24px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.05)" }}>
+               <div style={{ textAlign: "center", marginBottom: "40px" }}>
+                  <div style={{ margin: "0 auto 20px", width: "60px", height: "60px", background: "rgba(255,239,0,0.1)", borderRadius: "18px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg viewBox="0 0 24 24" fill="var(--Y)" style={{ width: "32px" }}><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                   </div>
-                  <h1 style={{ fontSize: "24px", fontWeight: 800, color: "#111", margin: "0 0 6px" }}>Admin Login</h1>
-                  <p style={{ fontSize: "13px", color: "#888", fontWeight: 500, margin: 0 }}>Authorized personnel only</p>
+                  <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", margin: "0 0 10px", fontFamily: "Orbitron" }}>{authMode === 'login' ? 'Admin Portal' : 'Reset Password'}</h1>
+                  <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", fontWeight: 500, margin: 0 }}>
+                    {authMode === 'login' ? 'Enter your credentials to manage Raitoopto' : 'Enter your email to receive a reset link'}
+                  </p>
                </div>
 
-               <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#999", textTransform: "uppercase", marginBottom: "8px" }}>Username</label>
-                    <input type="text" value={loginForm.username} onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })} placeholder="Username" style={{ width: "100%", padding: "14px 16px", borderRadius: "8px", border: "1.5px solid #eee", background: "#fafafa" }} required autoFocus />
-                  </div>
-                  <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: 700, color: "#999", textTransform: "uppercase", marginBottom: "8px" }}>Password</label>
-                    <input type="password" value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="Password" style={{ width: "100%", padding: "14px 16px", borderRadius: "8px", border: "1.5px solid #eee", background: "#fafafa" }} required />
-                  </div>
-                  {error && <div style={{ background: "#fee", color: "#e00", padding: "10px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textAlign: "center" }}>{error}</div>}
-                  <button type="submit" disabled={loading} style={{ width: "100%", padding: "16px", border: "none", borderRadius: "8px", background: "var(--Y)", color: "#000", fontWeight: 700, fontSize: "14px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "1px", marginTop: "10px" }}>{loading ? "Authenticating..." : "Login to Dashboard"}</button>
-               </form>
-               <div style={{ marginTop: "20px", textAlign: "center" }}>
-                  <Link to="/" style={{ color: "#777", fontSize: "12px", textDecoration: "none" }}><i className="fas fa-arrow-left"></i> Return to Site</Link>
-               </div>
+               {authMode === 'login' ? (
+                 <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "1px" }}>Username</label>
+                      <input type="text" value={loginForm.username} onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })} placeholder="admin" style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: "#fff", outline: "none" }} required autoFocus />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "1px" }}>Password</label>
+                      <input type="password" value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="••••••••" style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: "#fff", outline: "none" }} required />
+                    </div>
+                    {(error || success) && <div style={{ background: error ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)", color: error ? "#ef4444" : "#10b981", padding: "12px", borderRadius: "12px", fontSize: "13px", fontWeight: 600, textAlign: "center", border: `1px solid ${error ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}` }}>{error || success}</div>}
+                    
+                    <div style={{ textAlign: "right", marginTop: "-10px" }}>
+                       <button type="button" onClick={() => { setAuthMode("forgot"); setError(""); setSuccess(""); }} style={{ background: "none", border: "none", color: "var(--Y)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>Forgot Password?</button>
+                    </div>
+
+                    <button type="submit" disabled={loading} style={{ width: "100%", padding: "18px", border: "none", borderRadius: "12px", background: "var(--Y)", color: "#000", fontWeight: 800, fontSize: "15px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "1.5px", marginTop: "10px", transition: "0.3s" }}>{loading ? "Authenticating..." : "Login to Console"}</button>
+                 </form>
+               ) : (
+                 <form onSubmit={handleForgotPassword} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "1px" }}>Work Email</label>
+                      <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} placeholder="your@email.com" style={{ width: "100%", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: "#fff", outline: "none" }} required />
+                    </div>
+                    {error && <div style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", padding: "12px", borderRadius: "12px", fontSize: "13px", fontWeight: 600, textAlign: "center" }}>{error}</div>}
+                    
+                    <button type="submit" disabled={loading} style={{ width: "100%", padding: "18px", border: "none", borderRadius: "12px", background: "var(--Y)", color: "#000", fontWeight: 800, fontSize: "15px", cursor: "pointer", textTransform: "uppercase", letterSpacing: "1.5px" }}>{loading ? "Sending..." : "Recover Password"}</button>
+                    
+                    <button type="button" onClick={() => { setAuthMode("login"); setError(""); setSuccess(""); }} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>Back to Login</button>
+                 </form>
+               )}
             </div>
           </div>
-          <footer style={{ padding: "30px", textAlign: "center", borderTop: "1px solid #eee", background: "#fff" }}>
-             <div style={{ fontSize: "11px", color: "#aaa", fontWeight: 700, letterSpacing: "1px" }}>© 2026 LASER EXPERTS INDIA • ADMIN MANAGEMENT SYSTEM</div>
+          <footer style={{ padding: "30px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", fontWeight: 700, letterSpacing: "2px" }}>© 2026 RAITOOPTO • INDUSTRIAL OS V4.0</div>
           </footer>
         </div>
       );
@@ -335,6 +426,7 @@ function Admin() {
             {[
               { id: 'dashboard', icon: 'fas fa-th-large', label: 'Console Home', color: '#6366f1' },
               { id: 'gallery', icon: 'fas fa-images', label: 'Media Library', color: '#ec4899' },
+              { id: 'blogs', icon: 'fas fa-newspaper', label: 'Company News', color: '#3b82f6' },
               { id: 'students', icon: 'fas fa-users', label: 'Candidate List', color: '#10b981' },
               { id: 'ats', icon: 'fas fa-chart-line', label: 'ATS Intelligence', color: '#8b5cf6' },
               { id: 'jobs', icon: 'fas fa-briefcase', label: 'Recruitment', color: '#f59e0b' }
@@ -346,7 +438,7 @@ function Admin() {
                 style={{ 
                   width: "calc(100% - 30px)", margin: "4px 15px", padding: "16px 20px", border: "none", 
                   background: activeTab === item.id ? "rgba(255,255,255,0.05)" : "none", 
-                  color: activeTab === item.id ? "#860c84" : "#888", 
+                  color: activeTab === item.id ? "#fff" : "#888", 
                   borderRadius: "12px",
                   textAlign: "left", display: "flex", alignItems: "center", gap: "15px", cursor: "pointer", 
                   fontSize: "13px", fontWeight: "800", transition: "all 0.3s"
@@ -356,7 +448,7 @@ function Admin() {
                   width: "32px", height: "32px", borderRadius: "8px",
                   background: activeTab === item.id ? item.color : "rgba(255,255,255,0.03)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  color: activeTab === item.id ? "#f5f111" : item.color,
+                  color: activeTab === item.id ? "#fff" : item.color,
                   transition: "all 0.3s"
                 }}>
                   <i className={item.icon} style={{ fontSize: "14px" }}></i>
@@ -382,22 +474,22 @@ function Admin() {
           </header>
 
           {(error || success) && (
-            <div style={{ padding: "15px", borderRadius: "10px", marginBottom: "20px", display: "flex", gap: "10px", background: error ? "#fff5f5" : "#f0fff4", color: error ? "#f03e3e" : "#2f9e44", border: `1px solid ${error ? '#ffe3e3' : '#dcfce7'}` }}>
+            <div style={{ padding: "15px", borderRadius: "10px", marginBottom: "20px", display: "flex", gap: "10px", background: error ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)", color: error ? "#ef4444" : "#10b981", border: `1px solid ${error ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}` }}>
                 {error || success}
             </div>
           )}
 
-          {/* DASHBOARD RESTORED RICHNESS */}
+          {/* DASHBOARD */}
           {activeTab === 'dashboard' && (
             <div className="db-rich-view">
                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "25px", marginBottom: "40px" }}>
                   {[
-                    { label: 'Applicants', val: students.length, icon: 'fas fa-users', color: '#6366f1' },
+                    { label: 'Applicants', val: students.length, icon: 'fas fa-users', color: '#10b981' },
                     { label: 'Media Files', val: gallery.length, icon: 'fas fa-images', color: '#ec4899' },
-                    { label: 'Active Roles', val: jobs.filter(j => j.status === 'Published').length, icon: 'fas fa-briefcase', color: '#10b981' },
-                    { label: 'Sections', val: categories.length, icon: 'fas fa-tags', color: '#f59e0b' }
+                    { label: 'News Posts', val: blogs.length, icon: 'fas fa-newspaper', color: '#3b82f6' },
+                    { label: 'Active Roles', val: jobs.filter(j => j.status === 'Published').length, icon: 'fas fa-briefcase', color: '#f59e0b' }
                   ].map((stat, idx) => (
-                    <div key={idx} className="admin-stat-card">
+                    <div key={idx} className="admin-stat-card" style={{ background: "#151518", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "24px" }}>
                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                           <div>
                             <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", fontWeight: 800, letterSpacing: "1px" }}>{stat.label}</div>
@@ -527,7 +619,59 @@ function Admin() {
             </div>
           )}
 
-          {/* GALLERY SECTION RESTORED */}
+          {/* BLOGS MANAGEMENT */}
+          {activeTab === 'blogs' && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+              <div className="admin-card">
+                 <h3 style={{ fontSize: "20px", marginBottom: "25px", fontFamily: "Orbitron" }}>{editingBlogId ? "Edit Blog Post" : "Compose New Blog"}</h3>
+                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                    <div>
+                      <label style={{ fontSize: "11px", fontWeight: 900, textTransform: "uppercase", opacity: 0.4, marginBottom: "8px", display: "block" }}>Blog Title</label>
+                      <input type="text" value={blogForm.title} onChange={e => setBlogForm({ ...blogForm, title: e.target.value })} style={{ width: "100%", padding: "14px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: "#fff" }} placeholder="Enter a catchy title..." />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: "11px", fontWeight: 900, textTransform: "uppercase", opacity: 0.4, marginBottom: "8px", display: "block" }}>Content / Story</label>
+                      <textarea value={blogForm.content} onChange={e => setBlogForm({ ...blogForm, content: e.target.value })} style={{ width: "100%", height: "200px", padding: "14px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)", color: "#fff", resize: "vertical" }} placeholder="Write your content here..." />
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "20px", alignItems: "end" }}>
+                       <div>
+                         <label style={{ fontSize: "11px", fontWeight: 900, textTransform: "uppercase", opacity: 0.4, marginBottom: "8px", display: "block" }}>Poster Image (Optional)</label>
+                         <input type="file" onChange={e => setBlogPoster(e.target.files[0])} style={{ width: "100%", padding: "10px", border: "1px dashed #3b82f6", borderRadius: "10px", color: "rgba(255,255,255,0.5)" }} />
+                       </div>
+                       <div style={{ display: "flex", gap: "10px" }}>
+                         {editingBlogId && <button onClick={() => { setEditingBlogId(null); setBlogForm({ title: "", content: "" }); }} className="btn-dk-v2">Cancel</button>}
+                         <button onClick={handleBlogSubmit} disabled={loading} className="btn-y" style={{ background: "#3b82f6", color: "#fff", border: "none", padding: "14px 30px", borderRadius: "10px", fontWeight: 800 }}>{loading ? "Processing..." : (editingBlogId ? "Update Post" : "Publish News")}</button>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+
+              <div className="admin-card">
+                 <h3 style={{ fontSize: "18px", marginBottom: "25px", color: "rgba(255,255,255,0.6)" }}>Published Updates</h3>
+                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
+                    {blogs.map(blog => (
+                      <div key={blog._id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+                         {blog.imageUrl && (
+                           <div style={{ height: "160px", width: "100%" }}>
+                              <img src={getFullUrl(blog.imageUrl)} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" />
+                           </div>
+                         )}
+                         <div style={{ padding: "20px", flex: 1 }}>
+                            <div style={{ fontSize: "10px", fontWeight: 900, color: "#3b82f6", textTransform: "uppercase", marginBottom: "8px" }}>{new Date(blog.date).toLocaleDateString()}</div>
+                            <h4 style={{ margin: "0 0 10px", fontSize: "16px", fontWeight: 800 }}>{blog.title}</h4>
+                            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", lineHeight: "1.6", height: "58px", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>{blog.content}</p>
+                            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                               <button onClick={() => { setEditingBlogId(blog._id); setBlogForm({ title: blog.title, content: blog.content }); setActiveTab('blogs'); window.scrollTo(0, 0); }} style={{ flex: 1, padding: "10px", borderRadius: "8px", background: "rgba(59,130,246,0.1)", border: "none", color: "#3b82f6", fontSize: "11px", fontWeight: 800, cursor: "pointer" }}><i className="fas fa-edit"></i> Edit</button>
+                               <button onClick={() => deleteBlog(blog._id)} style={{ width: "40px", height: "40px", borderRadius: "8px", background: "rgba(239,68,68,0.1)", border: "none", color: "#ef4444", cursor: "pointer" }}><i className="fas fa-trash"></i></button>
+                            </div>
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+            </div>
+          )}
+          {/* GALLERY SECTION */}
           {activeTab === 'gallery' && (
              <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
                 {/* Category Management */}

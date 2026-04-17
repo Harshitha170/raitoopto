@@ -9,13 +9,14 @@ const fs = require('fs');
 const pdf = require('pdf-parse');
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
-const { Admin: MongooseAdmin, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory } = require('./models/Schemas');
+const crypto = require('crypto');
+const { Admin: MongooseAdmin, Blog: MongooseBlog, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory } = require('./models/Schemas');
 const mockDb = require('./mockDb');
 
 dotenv.config();
 
 const app = express();
-let DB = { Admin: MongooseAdmin, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory };
+let DB = { Admin: MongooseAdmin, Blog: MongooseBlog, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory };
 let isMockMode = false;
 
 const PORT = process.env.PORT || 5000;
@@ -54,6 +55,7 @@ const seedInitialData = async () => {
         // Comprehensive Count Log
         const counts = {
             admins: await DB.Admin.countDocuments(),
+            blogs: await DB.Blog.countDocuments(),
             students: await DB.Student.countDocuments(),
             jobs: await DB.JobRole.countDocuments(),
             questions: await DB.JobQuestion.countDocuments(),
@@ -71,6 +73,15 @@ const seedInitialData = async () => {
                await admin.save();
             }
             console.log('Seed Admin Created - Username: admin, Password: password123');
+        }
+
+        // Blog Seed
+        if (counts.blogs === 0) {
+            await DB.Blog.insertMany([
+                { title: 'Welcome to Raitoopto News', content: 'We are excited to launch our new News section! Stay tuned for updates on laser technology and industrial automation.', author: 'Admin' },
+                { title: 'The Future of Fiber Lasers', content: 'Fiber laser technology is evolving rapidly. Learn how it is replacing traditional CO2 lasers in metal processing.', author: 'Admin' }
+            ]);
+            console.log('Initial blogs seeded');
         }
 
         // Categories Seed
@@ -239,16 +250,15 @@ const authenticateAdmin = (req, res, next) => {
   }
 };
 
-// --- ROUTES ---
+// --- AUTH ROUTES ---
 
-// 1. ADMIN AUTH (Single Admin Only)
+// 1. ADMIN - LOGIN
 app.post('/api/admin/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const admin = await DB.Admin.findOne({ username });
     if (!admin) return res.status(400).json({ message: 'Invalid credentials' });
 
-    // In Mock Mode, we just check fixed password for simplicity or use bcypth if stored
     if (isMockMode) {
         if(username === 'admin' && password === 'password123') {
            const token = jwt.sign({ id: 'mock-admin' }, SECRET, { expiresIn: '1d' });
@@ -264,7 +274,131 @@ app.post('/api/admin/login', async (req, res) => {
     res.json({ token, admin: { username: admin.username, email: admin.email } });
   } catch (err) {
     console.error('Login Error:', err);
-    res.status(500).json({ message: 'Database/Server Error. Possible IP Whitelist issue or DB Downtime.' });
+    res.status(500).json({ message: 'Database/Server Error' });
+  }
+});
+
+// 2. ADMIN - FORGOT PASSWORD
+app.post('/api/admin/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const admin = await DB.Admin.findOne({ email });
+    if (!admin) return res.status(404).json({ message: 'Admin with this email does not exist' });
+
+    const token = crypto.randomBytes(20).toString('hex');
+    admin.resetPasswordToken = token;
+    admin.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await admin.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL || 'https://raitoopto.netlify.app'}/reset-password/${token}`;
+    
+    const mailOptions = {
+      from: '"Laser Experts India" <harshuchethu3@gmail.com>',
+      to: admin.email,
+      subject: 'Password Reset Request',
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2>Password Reset Request</h2>
+          <p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
+          <p>Please click on the following link, or paste this into your browser to complete the process:</p>
+          <a href="${resetUrl}" style="background: #FFEF00; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+          <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: 'Recovery email sent successfully' });
+  } catch (err) {
+    console.error('Forgot Password Error:', err);
+    res.status(500).json({ message: 'Error sending recovery email' });
+  }
+});
+
+// 3. ADMIN - RESET PASSWORD
+app.post('/api/admin/reset-password/:token', async (req, res) => {
+  try {
+    const admin = await DB.Admin.findOne({
+      resetPasswordToken: req.params.token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!admin) return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
+
+    admin.password = req.body.password;
+    admin.resetPasswordToken = undefined;
+    admin.resetPasswordExpires = undefined;
+    await admin.save();
+
+    res.json({ message: 'Password has been updated successfully' });
+  } catch (err) {
+    console.error('Reset Password Error:', err);
+    res.status(500).json({ message: 'Error resetting password' });
+  }
+});
+
+// --- BLOG ROUTES ---
+
+// 1. GET ALL BLOGS (Public)
+app.get('/api/blogs', async (req, res) => {
+  try {
+    const blogs = await DB.Blog.find().sort({ date: -1 });
+    res.json(blogs);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch blogs' });
+  }
+});
+
+// 2. GET SINGLE BLOG (Public)
+app.get('/api/blogs/:id', async (req, res) => {
+  try {
+    const blog = await DB.Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ message: 'Blog not found' });
+    res.json(blog);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch blog' });
+  }
+});
+
+// 3. CREATE BLOG (Admin)
+app.post('/api/admin/blogs', authenticateAdmin, galleryUpload.single('poster'), async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    const blogData = {
+      title,
+      content,
+      imageUrl: req.file ? (process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`) : '',
+      author: 'Admin'
+    };
+    const newBlog = new DB.Blog(blogData);
+    await newBlog.save();
+    res.json(newBlog);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to create blog' });
+  }
+});
+
+// 4. UPDATE BLOG (Admin)
+app.put('/api/admin/blogs/:id', authenticateAdmin, galleryUpload.single('poster'), async (req, res) => {
+  try {
+    const updates = { ...req.body };
+    if (req.file) {
+      updates.imageUrl = process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`;
+    }
+    const updatedBlog = await DB.Blog.findByIdAndUpdate(req.params.id, updates, { new: true });
+    res.json(updatedBlog);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update blog' });
+  }
+});
+
+// 5. DELETE BLOG (Admin)
+app.delete('/api/admin/blogs/:id', authenticateAdmin, async (req, res) => {
+  try {
+    await DB.Blog.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Blog deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete blog' });
   }
 });
 

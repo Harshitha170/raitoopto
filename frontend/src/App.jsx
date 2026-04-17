@@ -10,6 +10,9 @@ import Gallery from "./pages/Gallery";
 import Career from "./pages/Career";
 import Admin from "./pages/Admin";
 import Contact from "./pages/Contact";
+import Blogs from "./pages/Blogs";
+import BlogDetail from "./pages/BlogDetail";
+import ResetPassword from "./pages/ResetPassword";
 import NetworkDetail from "./pages/NetworkDetail";
 import Remanufacturing from "./pages/Remanufacturing";
 import TurboBlower from "./pages/TurboBlower";
@@ -95,6 +98,9 @@ function App() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/career" element={<Career />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blogs/:id" element={<BlogDetail />} />
           <Route path="/repairs/remanufacturing" element={<Remanufacturing />} />
           <Route path="/repairs/turbo-blowers" element={<TurboBlower />} />
           <Route path="/repairs/fanuc-pump" element={<FanucVacuum />} />
