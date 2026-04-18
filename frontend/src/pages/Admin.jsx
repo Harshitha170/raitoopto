@@ -13,10 +13,10 @@ const getFullUrl = (url) => {
 };
 
 const SOCIAL_LINKS = {
-  facebook: "https://www.facebook.com/laserexpertsindia",
-  instagram: "https://www.instagram.com/laserexpertsindia",
-  linkedin: "https://www.linkedin.com/company/laser-experts-india",
-  youtube: "https://www.youtube.com/@laserexpertsindia"
+  facebook: "https://www.facebook.com/leibglr",
+  instagram: "https://www.instagram.com/laser_expert",
+  linkedin: "https://www.linkedin.com/company/laserexpertsindia-com/",
+  youtube: "https://www.youtube.com/@laserexperts-servicefirst1778"
 };
 
 function Admin() {
@@ -38,6 +38,7 @@ function Admin() {
   const [jobQForm, setJobQForm] = useState({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: 0, isMandatory: true });
   const [viewState, setViewState] = useState('list'); 
   const [editingQId, setEditingQId] = useState(null);
+  const [editingJobId, setEditingJobId] = useState(null);
   const [galleryForm, setGalleryForm] = useState({ caption: "", category: "Workspace" });
   const [galleryFile, setGalleryFile] = useState(null);
   
