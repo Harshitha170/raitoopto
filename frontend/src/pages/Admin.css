@@ -1,118 +1,168 @@
-/* Admin.css - Modern Light Theme Styles */
+/* Admin.css - Modern Professional UI Theme */
 
+:root {
+    --primary: #c19b6c;
+    --primary-light: #fdf8f4;
+    --primary-dark: #a17d52;
+    --secondary: #e3c19b;
+    --accent: #111;
+    --bg-main: #ffffff;
+    --sidebar-width: 280px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 10px 25px rgba(0,0,0,0.05);
+    --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+/* Global Reset & Basic UI */
 .admin-card { 
     background: #fff; 
     border: 1.5px solid #f0f0f0; 
     border-radius: 20px; 
-    transition: all 0.3s; 
+    transition: var(--transition); 
     padding: 30px; 
+    position: relative;
+    overflow: hidden;
 }
 
 .admin-card:hover { 
-    transform: translateY(-5px); 
-    border-color: #e3c19b; 
-    box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
+    transform: translateY(-8px); 
+    border-color: var(--primary); 
+    box-shadow: var(--shadow-lg); 
 }
 
+/* Sidebar Styling */
 .sidebar-item-lite { 
-    width: calc(100% - 20px); 
-    margin: 4px 10px; 
-    padding: 14px 20px; 
+    width: calc(100% - 24px); 
+    margin: 6px 12px; 
+    padding: 14px 18px; 
     border: none; 
     background: transparent; 
-    color: #333; 
+    color: #555; 
     border-radius: 12px; 
     text-align: left; 
     display: flex; 
     align-items: center; 
-    gap: 12px; 
+    gap: 14px; 
     cursor: pointer; 
     font-size: 14px; 
     font-weight: 700; 
-    transition: 0.3s; 
+    transition: var(--transition); 
+}
+
+.sidebar-item-lite:hover {
+    background: #f8f8f8;
+    color: var(--primary);
+    padding-left: 24px;
 }
 
 .sidebar-item-lite.active { 
-    background: #fdf8f4; 
-    color: #c19b6c; 
+    background: var(--primary-light); 
+    color: var(--primary); 
+    box-shadow: inset 4px 0 0 var(--primary);
 }
 
+.sidebar-item-lite i {
+    font-size: 16px;
+    transition: var(--transition);
+}
+
+.sidebar-item-lite:hover i {
+    transform: scale(1.1);
+}
+
+/* Dashboard Stat Cards */
+.stat-card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: var(--transition);
+}
+
+.admin-card:hover .stat-card-icon {
+    transform: rotate(-10deg) scale(1.1);
+}
+
+/* Buttons */
 .btn-lite { 
     padding: 12px 24px; 
     border-radius: 12px; 
     font-weight: 800; 
     cursor: pointer; 
-    transition: 0.3s; 
-    border: none; 
+    transition: var(--transition); 
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-lite-primary { 
-    background: #c19b6c; 
+    background: var(--primary); 
     color: #fff; 
+    box-shadow: 0 4px 12px rgba(193, 155, 108, 0.2);
 }
 
 .btn-lite-primary:hover { 
-    opacity: 0.9; 
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(193, 155, 108, 0.3);
 }
 
+.btn-lite-secondary {
+    background: #f5f5f5;
+    color: #444;
+}
+
+.btn-lite-secondary:hover {
+    background: #eee;
+}
+
+/* Form Controls */
 .input-lite { 
     width: 100%; 
-    padding: 14px; 
+    padding: 14px 18px; 
     border-radius: 12px; 
     border: 1.5px solid #eee; 
-    background: #f9f9f9; 
+    background: #fdfdfd; 
     font-size: 14px; 
+    font-family: inherit;
     outline: none; 
-    transition: 0.3s; 
+    transition: var(--transition); 
 }
 
 .input-lite:focus { 
-    border-color: #e3c19b; 
+    border-color: var(--primary); 
     background: #fff; 
+    box-shadow: 0 0 0 4px var(--primary-light);
 }
 
-@media (max-width: 768px) { 
-    .nav-date { display: none; } 
+/* Tables */
+table tr {
+    transition: var(--transition);
 }
 
-.gal-item-card:hover { 
-    transform: translateY(-8px); 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+table tbody tr:hover {
+    background: #fcfcfc;
+    transform: scale(1.005);
 }
 
-.preview-row { 
-    transition: 0.3s; 
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.preview-row:hover { 
-    border-color: #e3c19b !important; 
-    background: #fafafa !important; 
-    transform: translateX(8px); 
-}
-
-@keyframes dropdownFade { 
-    from { opacity: 0; transform: translateY(-15px); } 
-    to { opacity: 1; transform: translateY(0); } 
-}
-
-.btn-dk-v2 {
-    background: #f5f5f5; 
-    color: #333; 
-    border: 1px solid #eee;
-    padding: 12px 24px; 
-    border-radius: 12px; 
-    font-weight: 800; 
-    cursor: pointer; 
-    transition: 0.3s;
-}
-
-.btn-dk-v2:hover { 
-    background: #fff; 
-    border-color: #e3c19b; 
+main > div {
+    animation: fadeIn 0.4s ease-out;
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f9f9f9; }
 ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #ccc; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-light); }
