@@ -268,3 +268,62 @@ main > div {
 ::-webkit-scrollbar-track { background: #f1f5f9; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+    .admin-card {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    
+    .btn-lite {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    h1 {
+        font-size: 26px !important;
+    }
+
+    /* Wrap adjustment for smaller screens */
+    .wrap {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    nav .wrap {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    /* Make sure stat cards stack cleanly */
+    .stat-card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .input-lite {
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    /* Restrict sidebar sizing */
+    aside {
+        max-width: 85vw;
+    }
+    
+    /* Table optimizations for mobile */
+    table th, table td {
+        padding: 12px 15px !important;
+    }
+
+    td div {
+        font-size: 13px !important;
+    }
+
+    /* Make auth screen padding smaller */
+    .admin-auth-root > div {
+        padding: 20px !important;
+    }
+}

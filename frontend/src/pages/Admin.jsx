@@ -27,7 +27,7 @@ function Admin() {
   const [students, setStudents] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [blogs, setBlogs] = useState([]);
-  const [blogForm, setBlogForm] = useState({ title: "", content: "" });
+  const [blogForm, setBlogForm] = useState({ title: "", content: "", type: "Blog" });
   const [blogPoster, setBlogPoster] = useState(null);
   const [editingBlogId, setEditingBlogId] = useState(null);
   
@@ -182,6 +182,7 @@ function Admin() {
       const fd = new FormData();
       fd.append("title", blogForm.title);
       fd.append("content", blogForm.content);
+      if (blogForm.type) fd.append("type", blogForm.type);
       if (blogPoster) fd.append("poster", blogPoster);
 
       const url = editingBlogId 
@@ -196,7 +197,7 @@ function Admin() {
 
       if (resp.ok) {
         notify('success', editingBlogId ? "Blog updated!" : "Blog published!");
-        setBlogForm({ title: "", content: "" });
+        setBlogForm({ title: "", content: "", type: "Blog" });
         setBlogPoster(null);
         setEditingBlogId(null);
         fetchData();
@@ -280,9 +281,21 @@ function Admin() {
   };
 
   const delGallery = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
-    await fetch(`${API_BASE_URL}/api/admin/gallery/${id}`, { method: "DELETE", headers: { "x-auth-token": token } });
-    fetchData();
+    if (!window.confirm("Delete this gallery asset?")) return;
+    try {
+      const resp = await fetch(`${API_BASE_URL}/api/admin/gallery/${id}`, {
+        method: "DELETE",
+        headers: { "x-auth-token": token }
+      });
+      if (resp.ok) {
+        notify('success', "Asset deleted successfully.");
+        fetchData();
+      } else {
+        notify('error', "Failed to delete asset.");
+      }
+    } catch (err) {
+      notify('error', "Failed to delete asset.");
+    }
   };
 
   const deleteJob = async (id) => {
@@ -736,6 +749,110 @@ function Admin() {
                      </tbody>
                   </table>
                 </div>
+             </div>
+           )}
+
+           {/* BLOGS AND CASE STUDIES MODULE */}
+           {activeTab === 'blogs' && (
+             <div className="admin-card">
+               <h3 style={{ fontSize: "20px", fontWeight: 800, marginBottom: "25px" }}>{editingBlogId ? 'Update Post' : 'Publish New Content'}</h3>
+               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "25px" }}>
+                 <div style={{ gridColumn: "span 2" }}>
+                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Title / Headline</label>
+                   <input type="text" className="input-lite" value={blogForm.title} onChange={e => setBlogForm({...blogForm, title: e.target.value})} placeholder="Enter post title..." />
+                 </div>
+                 <div>
+                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Content Type</label>
+                   <select className="input-lite" value={blogForm.type || 'Blog'} onChange={e => setBlogForm({...blogForm, type: e.target.value})}>
+                      <option value="Blog">Standard Blog</option>
+                      <option value="Case Study">Case Study Article</option>
+                   </select>
+                 </div>
+                 <div style={{ gridColumn: "span 2" }}>
+                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Abstract / Description</label>
+                   <textarea className="input-lite" style={{ height: "150px", resize: "none" }} value={blogForm.content} onChange={e => setBlogForm({...blogForm, content: e.target.value})} placeholder="Write a summary or full article here..."></textarea>
+                 </div>
+                 <div>
+                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Cover Image (Optional)</label>
+                   <input type="file" onChange={e => setBlogPoster(e.target.files[0])} className="input-lite" accept="image/*" />
+                 </div>
+               </div>
+               <div style={{ display: "flex", gap: "10px", marginTop: "25px" }}>
+                 <button onClick={handleBlogSubmit} className="btn-lite btn-lite-primary" style={{ width: "200px" }}>{loading ? "Publishing..." : (editingBlogId ? "Update Content" : "Publish Content")}</button>
+                 {editingBlogId && <button onClick={() => { setEditingBlogId(null); setBlogForm({ title: "", content: "", type: "Blog" }); setBlogPoster(null); }} className="btn-lite btn-lite-secondary">Cancel</button>}
+               </div>
+               
+               <div style={{ marginTop: "40px", borderTop: "1px solid #f0f0f0", paddingTop: "30px" }}>
+                  <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 20px" }}>Published Assets ({blogs.length})</h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
+                     {blogs.map(b => (
+                       <div key={b._id} style={{ padding: "20px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0", position: "relative" }}>
+                          <div style={{ fontSize: "10px", fontWeight: 800, padding: "4px 8px", background: b.type === 'Case Study' ? 'linear-gradient(135deg, #ec4899, #f43f5e)' : 'linear-gradient(135deg, #6366f1, #a855f7)', color: '#fff', borderRadius: "6px", display: "inline-block", marginBottom: "12px", letterSpacing: "1px" }}>{b.type ? b.type.toUpperCase() : 'BLOG'}</div>
+                          <h4 style={{ fontWeight: 800, fontSize: "16px", margin: "0 0 10px", color: "var(--accent)" }}>{b.title}</h4>
+                          <p style={{ fontSize: "13px", color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", margin: "0 0 20px", lineHeight: 1.6 }}>{b.content}</p>
+                          <div style={{ display: "flex", gap: "10px" }}>
+                             <button onClick={() => { setEditingBlogId(b._id); setBlogForm({ title: b.title, content: b.content, type: b.type || 'Blog' }); window.scrollTo({top: 0, behavior: 'smooth'}); }} style={{ flex: "1", padding: "8px", background: "var(--primary-light)", border: "none", color: "var(--primary)", fontWeight: 700, borderRadius: "8px", cursor: "pointer", fontSize: "12px" }}>Edit</button>
+                             <button onClick={() => deleteBlog(b._id)} style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", background: "#fef2f2", border: "none", color: "#ef4444", borderRadius: "8px", cursor: "pointer" }}><i className="fas fa-trash-alt"></i></button>
+                          </div>
+                       </div>
+                     ))}
+                  </div>
+               </div>
+             </div>
+           )}
+
+           {/* GALLERY MODULE */}
+           {activeTab === 'gallery' && (
+             <div className="admin-card">
+               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px", flexWrap: "wrap", gap: "15px" }}>
+                  <h3 style={{ fontSize: "20px", fontWeight: 800, margin: 0 }}>Media Gallery</h3>
+                  <div style={{ display: "flex", gap: "10px", background: "#f1f5f9", padding: "6px", borderRadius: "12px" }}>
+                     <input type="text" placeholder="New Category..." value={newCatName} onChange={e => setNewCatName(e.target.value)} style={{ padding: "8px 12px", border: "none", borderRadius: "8px", outline: "none", width: "160px" }} />
+                     <button onClick={handleAddCategory} style={{ padding: "8px 16px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: "8px", fontWeight: 800, cursor: "pointer" }}>Add</button>
+                  </div>
+               </div>
+               
+               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "30px", padding: "18px", background: "#f8fafc", borderRadius: "16px", border: "1px dashed #cbd5e1" }}>
+                 <div style={{ fontWeight: 800, fontSize: "12px", width: "100%", color: "#64748b", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Active Categories:</div>
+                 {categories.map((c, i) => (
+                   <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", background: "#fff", padding: "8px 14px", borderRadius: "100px", border: "1px solid #e2e8f0", fontSize: "12px", fontWeight: 700, color: "var(--primary)" }}>
+                     {c} <i className="fas fa-times-circle" style={{ color: "#ef4444", cursor: "pointer", fontSize: "14px", marginLeft: "4px" }} onClick={() => handleDeleteCategory(c)}></i>
+                   </div>
+                 ))}
+               </div>
+
+               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "25px" }}>
+                 <div>
+                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Select Asset (Image / Video)</label>
+                   <input id="galleryFileInput" type="file" onChange={e => setGalleryFile(e.target.files[0])} className="input-lite" />
+                 </div>
+                 <div>
+                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Caption</label>
+                   <input type="text" className="input-lite" value={galleryForm.caption} onChange={e => setGalleryForm({...galleryForm, caption: e.target.value})} placeholder="Location or brief description..." />
+                 </div>
+                 <div>
+                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#444", marginBottom: "10px" }}>Category</label>
+                   <select className="input-lite" value={galleryForm.category} onChange={e => setGalleryForm({...galleryForm, category: e.target.value})}>
+                     {categories.map((c, i) => <option key={i} value={c}>{c}</option>)}
+                   </select>
+                 </div>
+                 <div style={{ display: "flex", alignItems: "flex-end" }}>
+                   <button onClick={handleGalleryUpload} className="btn-lite btn-lite-primary" style={{ width: "100%", padding: "15px" }}>{loading ? "Uploading..." : "Upload Asset"}</button>
+                 </div>
+               </div>
+
+               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "25px", marginTop: "40px", borderTop: "1px solid #f0f0f0", paddingTop: "35px" }}>
+                  {gallery.map(g => (
+                    <div key={g._id} style={{ position: "relative", borderRadius: "16px", overflow: "hidden", boxShadow: "var(--shadow-sm)", background: "#000", group: "true" }}>
+                       <img src={getFullUrl(g.imageUrl)} alt={g.caption} style={{ width: "100%", height: "240px", objectFit: "cover", display: "block", opacity: 0.9 }} />
+                       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "40px 20px 20px", background: "linear-gradient(transparent, rgba(15,23,42,0.95))", color: "#fff" }}>
+                          <div style={{ fontSize: "15px", fontWeight: 800, marginBottom: "4px" }}>{g.caption || 'Untitled Asset'}</div>
+                          <span style={{ fontSize: "10px", color: "#fff", background: "rgba(255,255,255,0.2)", padding: "4px 8px", borderRadius: "4px", fontWeight: 800, backdropFilter: "blur(4px)" }}>{g.category}</span>
+                       </div>
+                       <button onClick={() => delGallery(g._id)} style={{ position: "absolute", top: "15px", right: "15px", width: "36px", height: "36px", borderRadius: "10px", background: "rgba(239, 68, 68, 0.95)", color: "#fff", border: "none", cursor: "pointer", backdropFilter: "blur(4px)", boxShadow: "0 4px 10px rgba(0,0,0,0.2)" }}><i className="fas fa-trash-alt"></i></button>
+                    </div>
+                  ))}
+               </div>
              </div>
            )}
 

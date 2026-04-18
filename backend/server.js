@@ -363,10 +363,11 @@ app.get('/api/blogs/:id', async (req, res) => {
 // 3. CREATE BLOG (Admin)
 app.post('/api/admin/blogs', authenticateAdmin, galleryUpload.single('poster'), async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, type } = req.body;
     const blogData = {
       title,
       content,
+      type: type || 'Blog',
       imageUrl: req.file ? (process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`) : '',
       author: 'Admin'
     };
@@ -374,7 +375,7 @@ app.post('/api/admin/blogs', authenticateAdmin, galleryUpload.single('poster'), 
     await newBlog.save();
     res.json(newBlog);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create blog' });
+    res.status(500).json({ message: 'Failed to create blog/case study' });
   }
 });
 
@@ -388,7 +389,7 @@ app.put('/api/admin/blogs/:id', authenticateAdmin, galleryUpload.single('poster'
     const updatedBlog = await DB.Blog.findByIdAndUpdate(req.params.id, updates, { new: true });
     res.json(updatedBlog);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update blog' });
+    res.status(500).json({ message: 'Failed to update blog/case study' });
   }
 });
 
@@ -396,9 +397,9 @@ app.put('/api/admin/blogs/:id', authenticateAdmin, galleryUpload.single('poster'
 app.delete('/api/admin/blogs/:id', authenticateAdmin, async (req, res) => {
   try {
     await DB.Blog.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: 'Blog deleted successfully' });
+    res.json({ success: true, message: 'Deleted successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to delete blog' });
+    res.status(500).json({ message: 'Failed to delete entry' });
   }
 });
 

@@ -24,16 +24,18 @@ AdminSchema.pre('save', async function(next) {
 
 const Admin = mongoose.model('Admin', AdminSchema);
 
-// --- BLOG SCHEMA ---
+// --- BLOG / CASE STUDY SCHEMA ---
 const BlogSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
   imageUrl: { type: String },
+  type: { type: String, enum: ['Blog', 'Case Study'], default: 'Blog' },
   date: { type: Date, default: Date.now },
   author: { type: String, default: 'Admin' }
 });
 
 const Blog = mongoose.model('Blog', BlogSchema);
+
 
 // --- STUDENT SCHEMA ---
 const StudentSchema = new mongoose.Schema({
