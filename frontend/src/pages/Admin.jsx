@@ -424,13 +424,13 @@ function Admin() {
     <div className="admin-portal" style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", color: "#333", fontFamily: "'Inter', sans-serif" }}>
       
       {/* NAVBAR: BLACK CASE */}
-      <nav style={{ background: "#111", color: "#fff", position: "sticky", top: 0, zIndex: 1000, boxShadow: "0 4px 20px rgba(0,0,0,0.1)", borderBottom: "2px solid #e3c19b" }}>
+      <nav style={{ background: "var(--accent)", color: "#fff", position: "sticky", top: 0, zIndex: 1000, boxShadow: "0 4px 30px rgba(0,0,0,0.15)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         <div className="wrap" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: "70px", padding: "0 30px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <button onClick={() => setSidebarOpen(true)} style={{ background: "rgba(255,255,255,0.05)", border: "none", color: "#fff", width: "40px", height: "40px", borderRadius: "10px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="fas fa-bars"></i></button>
             <Link to="/" style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none", color: "#fff" }}>
-               <div style={{ fontSize: "22px", fontWeight: "900", color: "#e3c19b", letterSpacing: "1px" }}>RAITOOPTO</div>
-               <div style={{ padding: "4px 8px", background: "#e3c19b", borderRadius: "4px", color: "#000", fontSize: "10px", fontWeight: "900" }}>ADMIN</div>
+               <div style={{ fontSize: "22px", fontWeight: "900", color: "var(--primary-light)", letterSpacing: "1px" }}>RAITOOPTO</div>
+               <div style={{ padding: "4px 8px", background: "var(--primary)", borderRadius: "4px", color: "#fff", fontSize: "10px", fontWeight: "900" }}>ADMIN</div>
             </Link>
           </div>
           
@@ -439,7 +439,7 @@ function Admin() {
              <div style={{ height: "24px", width: "1px", background: "rgba(255,255,255,0.1)" }}></div>
              <div style={{ position: "relative" }}>
                 <button onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "8px 16px", borderRadius: "100px", fontSize: "13px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "10px" }}>
-                   <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "#e3c19b", color: "#000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 900 }}>A</div>
+                   <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "var(--grad-1)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: 900 }}>A</div>
                    Admin
                    <i className={`fas fa-chevron-${profileDropdownOpen ? 'up' : 'down'}`} style={{ fontSize: "10px", opacity: 0.5 }}></i>
                 </button>
@@ -511,8 +511,8 @@ function Admin() {
         <div className="wrap">
            <div style={{ marginBottom: "40px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "20px" }}>
               <div>
-                <div style={{ fontSize: "12px", fontWeight: 800, color: "#c19b6c", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "8px" }}>System Console</div>
-                <h1 style={{ margin: 0, fontSize: "clamp(24px, 4vw, 32px)", fontWeight: 900 }}>Welcome Back, <span style={{ color: "#c19b6c" }}>Admin</span></h1>
+                <div style={{ fontSize: "12px", fontWeight: 800, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "8px" }}>System Console</div>
+                <h1 style={{ margin: 0, fontSize: "clamp(24px, 4vw, 32px)", fontWeight: 900 }}>Welcome Back, <span style={{ color: "var(--primary)" }}>Admin</span></h1>
               </div>
               <button onClick={fetchData} className="btn-lite" style={{ background: "#f5f5f5", border: "1.5px solid #eee", fontSize: "13px", color: "#666" }}>
                  <i className="fas fa-sync" style={{ marginRight: "10px" }}></i> Refresh Data
@@ -591,9 +591,9 @@ function Admin() {
                       </div>
                    </div>
 
-                   <div className="admin-card" style={{ background: "#111", color: "#fff", borderColor: "#333" }}>
-                      <h3 style={{ margin: "0 0 15px", fontSize: "18px", fontWeight: 800, color: "var(--primary)" }}>System Reliability</h3>
-                      <p style={{ fontSize: "14px", color: "#aaa", lineHeight: "1.6", marginBottom: "25px" }}>Real-time synchronization active. Cloudinary and MongoDB pipelines are operating at 100% health.</p>
+                   <div className="admin-card dark-card">
+                      <h3 style={{ margin: "0 0 15px", fontSize: "18px", fontWeight: 800, color: "var(--primary-light)" }}>System Reliability</h3>
+                      <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", lineHeight: "1.6", marginBottom: "25px" }}>Real-time synchronization active. Cloudinary and MongoDB pipelines are operating at 100% health.</p>
                       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
                          {[
                            { label: "Storage Engine", status: "Operational", color: "#10b981", icon: "fa-cloud" },
