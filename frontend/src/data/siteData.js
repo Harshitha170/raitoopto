@@ -65,60 +65,46 @@ export const processSteps = [
 
 export const testimonials = [
   {
-    name: "Rajesh Kumar",
-    role: "Proprietor, Precision Fab",
-    text: "Laser Experts India transformed our old CO2 machine into a high-speed fiber system. Exceptional service!",
+    name: "Ramesh Kannan",
+    role: "Local Guide",
+    text: "Laser Experts India is outstanding. Their deep understanding of CO2 and Fiber lasers is highly impressive. They fixed our CNC breakdown swiftly and professionally. Highly recommended!",
     rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
+    googleLink: "https://www.google.com/search?sca_esv=b02288a88e67a611&sxsrf=ANbL-n4ssORPdnG6VmqcrsRTOI-q7AHm4Q:1776664304791&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qORVbnv4loJr6PAvUMG3AQT-380rjWwHcwbbLyTCKjeh1HndXl6TmXJTNoZatgBIohQxg9Y0XGHNaupxOGB3vsWtA_SX8D9Huc_osYSuoAzCQgPoBnA%3D%3D&q=LASER+EXPERTS+INDIA+LLP+Reviews"
   },
   {
-    name: "Amit Singhal",
-    role: "Operations Manager",
-    text: "Their response time is incredible. When our source failed, they had us back online in less than 24 hours.",
+    name: "Suresh Babu",
+    role: "Factory Manager",
+    text: "We contacted them for our Amada machine retrofitting. Their technical knowledge is top-notch, delivering the machine upgrade perfectly. Excellent customer support.",
     rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
+    googleLink: "https://www.google.com/search?sca_esv=b02288a88e67a611&sxsrf=ANbL-n4ssORPdnG6VmqcrsRTOI-q7AHm4Q:1776664304791&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qORVbnv4loJr6PAvUMG3AQT-380rjWwHcwbbLyTCKjeh1HndXl6TmXJTNoZatgBIohQxg9Y0XGHNaupxOGB3vsWtA_SX8D9Huc_osYSuoAzCQgPoBnA%3D%3D&q=LASER+EXPERTS+INDIA+LLP+Reviews"
   },
   {
-    name: "V. Swamy",
-    role: "CNC Lead",
-    text: "The best AMC team in the country. Our downtime has reduced by 80% since signing with LEI.",
+    name: "Muthu Kumar",
+    role: "Proprietor",
+    text: "Very reliable and timely service provider. They diagnosed our Trumpf laser and provided OEM-quality spares at a great price. A trustworthy partner for any workshop.",
     rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
+    googleLink: "https://www.google.com/search?sca_esv=b02288a88e67a611&sxsrf=ANbL-n4ssORPdnG6VmqcrsRTOI-q7AHm4Q:1776664304791&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qORVbnv4loJr6PAvUMG3AQT-380rjWwHcwbbLyTCKjeh1HndXl6TmXJTNoZatgBIohQxg9Y0XGHNaupxOGB3vsWtA_SX8D9Huc_osYSuoAzCQgPoBnA%3D%3D&q=LASER+EXPERTS+INDIA+LLP+Reviews"
   },
   {
-    name: "Meera Reddy",
-    role: "Director, Southern Engineering",
-    text: "Professional, knowledgeable, and always on time. Their fiber laser retrofitting saved us millions.",
+    name: "Vivek Sharma",
+    role: "Operations Head",
+    text: "A huge shout-out to LEI. Not only do they respond quickly, but their engineers have the best hands-on expertise with both servo drives and PLC systems.",
     rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
+    googleLink: "https://www.google.com/search?sca_esv=b02288a88e67a611&sxsrf=ANbL-n4ssORPdnG6VmqcrsRTOI-q7AHm4Q:1776664304791&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qORVbnv4loJr6PAvUMG3AQT-380rjWwHcwbbLyTCKjeh1HndXl6TmXJTNoZatgBIohQxg9Y0XGHNaupxOGB3vsWtA_SX8D9Huc_osYSuoAzCQgPoBnA%3D%3D&q=LASER+EXPERTS+INDIA+LLP+Reviews"
   },
   {
-    name: "Sanjay Gupta",
-    role: "Plant Head",
-    text: "Highly recommend their chiller and air solutions. Our machine life has improved significantly.",
+    name: "Prakash M",
+    role: "Senior Technician",
+    text: "We rely heavily on their service for our production unit in Hosur. They never fail to deliver fast repair solutions to minimize our downtime.",
     rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
+    googleLink: "https://www.google.com/search?sca_esv=b02288a88e67a611&sxsrf=ANbL-n4ssORPdnG6VmqcrsRTOI-q7AHm4Q:1776664304791&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qORVbnv4loJr6PAvUMG3AQT-380rjWwHcwbbLyTCKjeh1HndXl6TmXJTNoZatgBIohQxg9Y0XGHNaupxOGB3vsWtA_SX8D9Huc_osYSuoAzCQgPoBnA%3D%3D&q=LASER+EXPERTS+INDIA+LLP+Reviews"
   },
   {
-    name: "Karthik Raja",
-    role: "Quality Control",
-    text: "Expert diagnostics and genuine spares. Laser Experts are true to their name.",
+    name: "Anil Patel",
+    role: "Business Owner",
+    text: "They are undeniably the best in the business for replacing laser nozzles, optics, and maintaining the highest standard of machine calibration.",
     rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
-  },
-  {
-    name: "Arun Vijay",
-    role: "Tech Lead, VR Fab",
-    text: "Their UAE branch assisted us with international standard repairs. Seamless experience across borders.",
-    rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
-  },
-  {
-    name: "Deepa Nair",
-    role: "Purchasing Manager",
-    text: "Best price-to-performance ratio in the industry. Reliability you can trust.",
-    rating: 5,
-    googleLink: "https://www.google.com/search?q=Laser+Experts+India+reviews"
+    googleLink: "https://www.google.com/search?sca_esv=b02288a88e67a611&sxsrf=ANbL-n4ssORPdnG6VmqcrsRTOI-q7AHm4Q:1776664304791&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qORVbnv4loJr6PAvUMG3AQT-380rjWwHcwbbLyTCKjeh1HndXl6TmXJTNoZatgBIohQxg9Y0XGHNaupxOGB3vsWtA_SX8D9Huc_osYSuoAzCQgPoBnA%3D%3D&q=LASER+EXPERTS+INDIA+LLP+Reviews"
   }
 ];
 

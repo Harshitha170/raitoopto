@@ -46,20 +46,22 @@ function Testimonials() {
                 "
               </div>
               
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <div className="tc-stars" style={{ display: 'flex', gap: '4px', marginBottom: '20px' }}>
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div className="tc-stars" style={{ display: 'flex', gap: '4px', marginBottom: '15px' }}>
                   {[...Array(testi.rating)].map((_, i) => (
                     <svg key={i} viewBox="0 0 24 24" style={{ width: '18px', height: '18px', fill: 'var(--Y)' }}>
                       <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                     </svg>
                   ))}
                 </div>
-                <p className="tc-txt" style={{ fontSize: '16px', color: '#444', lineHeight: 1.8, fontStyle: 'italic', marginBottom: '20px' }}>
+                <p className="tc-txt" style={{ fontSize: '15px', color: '#444', lineHeight: 1.7, fontStyle: 'italic', marginBottom: '20px' }}>
                   "{testi.text}"
                 </p>
-                <a href="https://www.google.com/search?q=Laser+Experts+India+reviews" target="_blank" rel="noopener noreferrer" className="tc-gl" style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 800, color: "var(--DARK)", background: "var(--Y)", padding: "6px 14px", borderRadius: "20px", textTransform: "uppercase", letterSpacing: "1px", textDecoration: "none", transition: "background 0.3s ease" }}>
-                   <i className="fab fa-google"></i> {t('reviews.viewReview', 'View on Google')}
-                </a>
+                <div style={{ marginTop: 'auto' }}>
+                  <a href={testi.googleLink} target="_blank" rel="noopener noreferrer" className="tc-gl" style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "11px", fontWeight: 800, color: "var(--DARK)", background: "var(--Y)", padding: "8px 16px", borderRadius: "30px", textTransform: "uppercase", letterSpacing: "1px", textDecoration: "none", transition: "all 0.3s ease", whiteSpace: "nowrap", boxShadow: "0 4px 10px rgba(0,0,0,0.1)" }}>
+                     <i className="fab fa-google"></i> {t('reviews.viewReview', 'View Review on Google')}
+                  </a>
+                </div>
               </div>
               
               <div className="tc-auth" style={{ marginTop: "30px", paddingTop: "20px", borderTop: "1px solid rgba(0,0,0,0.05)", display: 'flex', alignItems: 'center', gap: '15px', position: 'relative', zIndex: 1 }}>

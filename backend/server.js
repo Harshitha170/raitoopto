@@ -10,13 +10,13 @@ const pdf = require('pdf-parse');
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const { Admin: MongooseAdmin, Blog: MongooseBlog, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory } = require('./models/Schemas');
+const { Admin: MongooseAdmin, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory } = require('./models/Schemas');
 const mockDb = require('./mockDb');
 
 dotenv.config();
 
 const app = express();
-let DB = { Admin: MongooseAdmin, Blog: MongooseBlog, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory };
+let DB = { Admin: MongooseAdmin, Student: MongooseStudent, Gallery: MongooseGallery, JobRole: MongooseJobRole, JobQuestion: MongooseJobQuestion, Category: MongooseCategory };
 let isMockMode = false;
 
 const PORT = process.env.PORT || 5000;
@@ -55,7 +55,6 @@ const seedInitialData = async () => {
         // Comprehensive Count Log
         const counts = {
             admins: await DB.Admin.countDocuments(),
-            blogs: await DB.Blog.countDocuments(),
             students: await DB.Student.countDocuments(),
             jobs: await DB.JobRole.countDocuments(),
             questions: await DB.JobQuestion.countDocuments(),
@@ -75,14 +74,6 @@ const seedInitialData = async () => {
             console.log('Seed Admin Created - Username: admin, Password: password123');
         }
 
-        // Blog Seed
-        if (counts.blogs === 0) {
-            await DB.Blog.insertMany([
-                { title: 'Welcome to Raitoopto News', content: 'We are excited to launch our new News section! Stay tuned for updates on laser technology and industrial automation.', author: 'Admin' },
-                { title: 'The Future of Fiber Lasers', content: 'Fiber laser technology is evolving rapidly. Learn how it is replacing traditional CO2 lasers in metal processing.', author: 'Admin' }
-            ]);
-            console.log('Initial blogs seeded');
-        }
 
         // Categories Seed
         if (counts.categories === 0) {
@@ -334,72 +325,6 @@ app.post('/api/admin/reset-password/:token', async (req, res) => {
   } catch (err) {
     console.error('Reset Password Error:', err);
     res.status(500).json({ message: 'Error resetting password' });
-  }
-});
-
-// --- BLOG ROUTES ---
-
-// 1. GET ALL BLOGS (Public)
-app.get('/api/blogs', async (req, res) => {
-  try {
-    const blogs = await DB.Blog.find().sort({ date: -1 });
-    res.json(blogs);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch blogs' });
-  }
-});
-
-// 2. GET SINGLE BLOG (Public)
-app.get('/api/blogs/:id', async (req, res) => {
-  try {
-    const blog = await DB.Blog.findById(req.params.id);
-    if (!blog) return res.status(404).json({ message: 'Blog not found' });
-    res.json(blog);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch blog' });
-  }
-});
-
-// 3. CREATE BLOG (Admin)
-app.post('/api/admin/blogs', authenticateAdmin, galleryUpload.single('poster'), async (req, res) => {
-  try {
-    const { title, content, type } = req.body;
-    const blogData = {
-      title,
-      content,
-      type: type || 'Blog',
-      imageUrl: req.file ? (process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`) : '',
-      author: 'Admin'
-    };
-    const newBlog = new DB.Blog(blogData);
-    await newBlog.save();
-    res.json(newBlog);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to create blog/case study' });
-  }
-});
-
-// 4. UPDATE BLOG (Admin)
-app.put('/api/admin/blogs/:id', authenticateAdmin, galleryUpload.single('poster'), async (req, res) => {
-  try {
-    const updates = { ...req.body };
-    if (req.file) {
-      updates.imageUrl = process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`;
-    }
-    const updatedBlog = await DB.Blog.findByIdAndUpdate(req.params.id, updates, { new: true });
-    res.json(updatedBlog);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to update blog/case study' });
-  }
-});
-
-// 5. DELETE BLOG (Admin)
-app.delete('/api/admin/blogs/:id', authenticateAdmin, async (req, res) => {
-  try {
-    await DB.Blog.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: 'Deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to delete entry' });
   }
 });
 
