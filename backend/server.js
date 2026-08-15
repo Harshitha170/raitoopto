@@ -121,7 +121,8 @@ const sendEmail = async ({ to, subject, html }) => {
         let data = '';
         res.on('data', chunk => data += chunk);
         res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
+          if ((res.statusCode >= 200 && res.statusCode < 400) || res.statusCode === 302) {
+            console.log('Webhook dispatched successfully with status:', res.statusCode);
             resolve({ success: true, data });
           } else {
             reject(new Error(`Webhook failed (${res.statusCode}): ${data}`));
