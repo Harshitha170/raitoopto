@@ -38,15 +38,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 
 // --- EMAIL SERVICE SETUP ---
 const emailUser = (process.env.EMAIL_USER || 'harshuchethu3@gmail.com').trim();
-const emailPass = (process.env.EMAIL_PASS || 'gychdfekijpkaymz').replace(/\s+/g, '');
+const emailPass = (process.env.EMAIL_PASS || 'jxuovahlkbgpzebv').replace(/\s+/g, '');
+const emailHost = (process.env.EMAIL_HOST || 'smtp.gmail.com').trim();
+const emailPort = parseInt(process.env.EMAIL_PORT) || 465;
 const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
 const emailWebhookUrl = (process.env.EMAIL_WEBHOOK_URL || '').trim();
 
-// Nodemailer SMTP fallback (for local development or unblocked networks)
+// Nodemailer SMTP setup
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  host: emailHost,
+  port: emailPort,
+  secure: emailPort === 465,
   auth: {
     user: emailUser,
     pass: emailPass
