@@ -181,8 +181,8 @@ if (useCloudinary) {
       const cleanName = rawName.replace(/[^a-zA-Z0-9-_]/g, '_');
       return {
         folder: 'lei-resumes',
-        resource_type: 'auto',
-        format: ext,
+        resource_type: 'image',
+        format: ext === 'pdf' ? 'pdf' : undefined,
         public_id: `${cleanName}-${Date.now()}`
       };
     }

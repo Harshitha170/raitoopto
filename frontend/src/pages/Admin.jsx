@@ -13,25 +13,18 @@ const getFullUrl = (url) => {
    return `${API_BASE_URL}/${url.replace(/^\//, '')}`;
 };
 
-const viewPdfDocument = async (url) => {
+const viewPdfDocument = (url) => {
    if (!url) return;
-   const fullUrl = getFullUrl(url);
-   try {
-      let resp = await fetch(fullUrl).catch(() => null);
-      if (!resp || !resp.ok) {
-         resp = await fetch(`${API_BASE_URL}/api/view-file?url=${encodeURIComponent(fullUrl)}`).catch(() => null);
-      }
-      if (resp && resp.ok) {
-         const blob = await resp.blob();
-         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
-         const blobUrl = URL.createObjectURL(pdfBlob);
-         window.open(blobUrl, '_blank', 'noopener,noreferrer');
-      } else {
-         window.open(fullUrl, '_blank', 'noopener,noreferrer');
-      }
-   } catch (e) {
-      window.open(fullUrl, '_blank', 'noopener,noreferrer');
+   let finalUrl = url;
+   if (!finalUrl.startsWith('http')) {
+      finalUrl = `${API_BASE_URL}/${finalUrl.replace(/^\//, '')}`;
+   } else {
+      finalUrl = finalUrl.replace(/^http:\/\//i, 'https://');
    }
+
+   // Directly open the backend proxy endpoint in a new tab.
+   const proxyUrl = `${API_BASE_URL}/api/view-file?url=${encodeURIComponent(finalUrl)}`;
+   window.open(proxyUrl, '_blank', 'noopener,noreferrer');
 };
 
 // eslint-disable-next-line no-unused-vars

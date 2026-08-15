@@ -4,12 +4,19 @@ import { Link } from "react-router-dom";
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 // eslint-disable-next-line no-unused-vars
-const getFullUrl = (url) => {
-   if (!url) return '';
-   if (url.startsWith('http')) {
-       return url.replace(/^http:\/\//i, 'https://');
+const openPdfViewerTab = (url) => {
+   if (!url) return;
+   let finalUrl = url;
+   if (!finalUrl.startsWith('http')) {
+      finalUrl = `${API_BASE_URL}/${finalUrl.replace(/^\//, '')}`;
+   } else {
+      finalUrl = finalUrl.replace(/^http:\/\//i, 'https://');
    }
-   return `${API_BASE_URL}/${url.replace(/^\//, '')}`;
+
+   // Directly open the backend proxy endpoint in a new tab. 
+   // The backend serves the file with Content-Type: application/pdf and Content-Disposition: inline
+   const proxyUrl = `${API_BASE_URL}/api/view-file?url=${encodeURIComponent(finalUrl)}`;
+   window.open(proxyUrl, '_blank', 'noopener,noreferrer');
 };
 
 function getJobIcon(title) {
@@ -27,103 +34,7 @@ function getJobIcon(title) {
   return "🛠️";
 }
 
-function PDFViewer({ url }) {
-  const [blobUrl, setBlobUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError(false);
-
-    const loadPdf = async () => {
-      try {
-        let resp = await fetch(url).catch(() => null);
-        if (!resp || !resp.ok) {
-          resp = await fetch(`${API_BASE_URL}/api/view-file?url=${encodeURIComponent(url)}`).catch(() => null);
-        }
-        if (resp && resp.ok) {
-          const blob = await resp.blob();
-          if (active) {
-            const pdfBlob = new Blob([blob], { type: 'application/pdf' });
-            const objectUrl = URL.createObjectURL(pdfBlob);
-            setBlobUrl(objectUrl);
-            setLoading(false);
-          }
-        } else {
-          throw new Error('Failed to load PDF');
-        }
-      } catch (err) {
-        console.error('PDF load error:', err);
-        if (active) {
-          setError(true);
-          setLoading(false);
-        }
-      }
-    };
-
-    if (url) loadPdf();
-
-    return () => {
-      active = false;
-      if (blobUrl) URL.revokeObjectURL(blobUrl);
-    };
-  }, [url]);
-
-  const handleOpenNewTab = () => {
-    if (blobUrl) {
-      window.open(blobUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  };
-
-  return (
-    <div style={{ background: '#f5f5f5', borderRadius: '8px', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#e8e8e8', borderBottom: '1px solid #ddd' }}>
-        <span style={{ fontSize: '12px', color: '#333', fontWeight: 700 }}>📄 PDF Document</span>
-        <button
-          onClick={handleOpenNewTab}
-          style={{ fontSize: '12px', fontWeight: 700, color: '#0A0A0C', background: 'var(--Y)', padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
-        >
-          ↗ Open in New Tab
-        </button>
-      </div>
-      {loading ? (
-        <div style={{ padding: '60px', textAlign: 'center', color: '#666', fontSize: '14px', fontWeight: 600 }}>
-          ⏳ Loading PDF preview...
-        </div>
-      ) : error || !blobUrl ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#888', background: '#fff' }}>
-          <p style={{ marginBottom: '15px', fontSize: '14px' }}>Unable to load embedded preview.</p>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ display: 'inline-block', background: '#0A0A0C', color: '#fff', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '13px' }}
-          >
-            View / Download File Directly →
-          </a>
-        </div>
-      ) : (
-        <iframe
-          src={`${blobUrl}#toolbar=1`}
-          style={{ width: '100%', height: '65vh', border: 'none', display: 'block', background: '#ffffff' }}
-          title="Job Description PDF"
-        />
-      )}
-    </div>
-  );
-}
-
 function JDModal({ job, onClose }) {
-  const rawUrl = (() => {
-    let u = job.jdFileUrl;
-    if (u.startsWith('http')) return u.replace(/^http:\/\//i, 'https://');
-    return `${API_BASE_URL}/${u.replace(/^\//, '')}`;
-  })();
-
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 9999,
@@ -166,9 +77,14 @@ function JDModal({ job, onClose }) {
             </div>
           )}
           {job.jdFileUrl && (
-            <div style={{ marginTop: "10px" }}>
-              <div style={{ fontFamily: "Orbitron, sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "2px", color: "#888", marginBottom: "10px" }}>JD DOCUMENT</div>
-              <PDFViewer url={rawUrl} />
+            <div style={{ marginTop: "25px", paddingTop: "20px", borderTop: "1px solid #eee" }}>
+              <button
+                onClick={() => openPdfViewerTab(job.jdFileUrl)}
+                className="btn-y"
+                style={{ width: "100%", padding: "14px", fontSize: "13px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", borderRadius: "8px" }}
+              >
+                📄 Open Official JD Document (.pdf) →
+              </button>
             </div>
           )}
         </div>
@@ -345,16 +261,26 @@ function Career() {
 
                     {/* Card Actions */}
                     <div style={{ padding: "16px 20px", borderTop: "1px solid #f0f0f0", display: "flex", gap: "10px" }}>
-                      <button onClick={() => setJdJob(j)} style={{
-                        flex: 1, background: "transparent", color: "#0A0A0C",
-                        border: "1.5px solid #ddd", borderRadius: "6px",
-                        padding: "10px", fontWeight: 700, cursor: "pointer",
-                        fontSize: "12px", fontFamily: "Exo 2, sans-serif",
-                        transition: "all 0.2s"
-                      }}
+                      <button 
+                        onClick={() => {
+                          if (j.jdFileUrl) {
+                            openPdfViewerTab(j.jdFileUrl);
+                          } else {
+                            setJdJob(j);
+                          }
+                        }} 
+                        style={{
+                          flex: 1, background: "transparent", color: "#0A0A0C",
+                          border: "1.5px solid #ddd", borderRadius: "6px",
+                          padding: "10px", fontWeight: 700, cursor: "pointer",
+                          fontSize: "12px", fontFamily: "Exo 2, sans-serif",
+                          transition: "all 0.2s"
+                        }}
                         onMouseEnter={e => { e.target.style.borderColor = "var(--Y)"; }}
                         onMouseLeave={e => { e.target.style.borderColor = "#ddd"; }}
-                      >📄 View JD</button>
+                      >
+                        📄 View JD
+                      </button>
                       <button onClick={() => {setActiveJob(j);setStep(2);}} className="btn-y" style={{ flex: 2, borderRadius: "6px" }}>Apply Now →</button>
                     </div>
                   </div>
