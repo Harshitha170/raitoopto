@@ -1038,7 +1038,8 @@ app.get('/api/view-file', async (req, res) => {
         res.setHeader('Content-Disposition', 'inline');
         res.setHeader('Cache-Control', 'public, max-age=31536000');
 
-        const buffer = await response.buffer();
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
         res.send(buffer);
     } catch (err) {
         console.error("File proxy error:", err.message);
