@@ -509,9 +509,6 @@ function Admin() {
                      <div style={{ fontSize: "12px", fontWeight: 800, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "8px" }}>System Console</div>
                      <h1 style={{ margin: 0, fontSize: "clamp(24px, 4vw, 32px)", fontWeight: 900 }}>Welcome Back, <span style={{ color: "var(--primary)" }}>Admin</span></h1>
                   </div>
-                  <button onClick={fetchData} className="btn-lite" style={{ background: "#f5f5f5", border: "1.5px solid #eee", fontSize: "13px", color: "#666" }}>
-                     <i className="fas fa-sync" style={{ marginRight: "10px" }}></i> Refresh Data
-                  </button>
                </div>
 
                {(error || success) && (
