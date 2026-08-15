@@ -1024,6 +1024,28 @@ app.get('/api/admin/db-health', authenticateAdmin, async (req, res) => {
     } catch(err) { res.status(500).send(err.message); }
 });
 
+// --- PDF VIEWER PROXY (forces inline display) ---
+app.get('/api/view-file', async (req, res) => {
+    try {
+        const fileUrl = req.query.url;
+        if (!fileUrl) return res.status(400).json({ message: 'URL parameter required' });
+
+        const response = await fetch(fileUrl);
+        if (!response.ok) return res.status(response.status).json({ message: 'Failed to fetch file' });
+
+        const contentType = response.headers.get('content-type') || 'application/octet-stream';
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', 'inline');
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+
+        const buffer = await response.buffer();
+        res.send(buffer);
+    } catch (err) {
+        console.error("File proxy error:", err.message);
+        res.status(500).json({ message: 'Failed to load file' });
+    }
+});
+
 // --- GLOBAL ERROR HANDLER ---
 app.use((err, req, res, next) => {
     console.error("Unhandled Error:", err.message);

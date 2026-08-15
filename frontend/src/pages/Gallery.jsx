@@ -5,11 +5,17 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const getFullUrl = (url) => {
   if (!url) return '';
+  let finalUrl = url;
   if (url.startsWith('http')) {
-      return url.replace(/^http:\/\//i, 'https://');
+      finalUrl = url.replace(/^http:\/\//i, 'https://');
+  } else {
+      const cleanPath = url.replace(/^\//, '');
+      finalUrl = `${API_BASE_URL}/${cleanPath}`;
   }
-  const cleanPath = url.replace(/^\//, '');
-  return `${API_BASE_URL}/${cleanPath}`;
+  if (finalUrl.includes('cloudinary.com')) {
+      finalUrl = `${API_BASE_URL}/api/view-file?url=${encodeURIComponent(finalUrl)}`;
+  }
+  return finalUrl;
 };
 
 const CAT_COLORS = {
