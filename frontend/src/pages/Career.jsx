@@ -3,19 +3,13 @@ import { Link } from "react-router-dom";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+// eslint-disable-next-line no-unused-vars
 const getFullUrl = (url) => {
    if (!url) return '';
-   let finalUrl = url;
    if (url.startsWith('http')) {
-       finalUrl = url.replace(/^http:\/\//i, 'https://');
-   } else {
-       const cleanPath = url.replace(/^\//, '');
-       finalUrl = `${API_BASE_URL}/${cleanPath}`;
+       return url.replace(/^http:\/\//i, 'https://');
    }
-   if (finalUrl.includes('cloudinary.com')) {
-       finalUrl = `${API_BASE_URL}/api/view-file?url=${encodeURIComponent(finalUrl)}`;
-   }
-   return finalUrl;
+   return `${API_BASE_URL}/${url.replace(/^\//, '')}`;
 };
 
 function getJobIcon(title) {
@@ -33,7 +27,41 @@ function getJobIcon(title) {
   return "🛠️";
 }
 
+function PDFViewer({ url }) {
+  // Use Google Docs Viewer for iframe embedding - works with Cloudinary raw URLs
+  // The direct URL is used for "Open in New Tab" so the browser renders it natively
+  const googleDocsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+
+  return (
+    <div style={{ background: '#f5f5f5', borderRadius: '8px', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#e8e8e8', borderBottom: '1px solid #ddd' }}>
+        <span style={{ fontSize: '11px', color: '#666', fontWeight: 600 }}>📄 PDF Preview</span>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: '12px', fontWeight: 700, color: '#0A0A0C', textDecoration: 'none', background: 'var(--Y)', padding: '5px 14px', borderRadius: '5px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+        >
+          🔗 Open in New Tab
+        </a>
+      </div>
+      <iframe
+        src={googleDocsViewerUrl}
+        style={{ width: '100%', height: '65vh', border: 'none', display: 'block' }}
+        title="Job Description PDF"
+      />
+    </div>
+  );
+}
+
 function JDModal({ job, onClose }) {
+  const rawUrl = (() => {
+    let u = job.jdFileUrl;
+    if (u.startsWith('http')) return u.replace(/^http:\/\//i, 'https://');
+    return `${API_BASE_URL}/${u.replace(/^\//, '')}`;
+  })();
+  const isDoc = /\.(doc|docx)$/i.test(rawUrl);
+
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 9999,
@@ -41,18 +69,18 @@ function JDModal({ job, onClose }) {
       alignItems: "center", justifyContent: "center", padding: "20px"
     }} onClick={onClose}>
       <div style={{
-        background: "#fff", borderRadius: "12px", maxWidth: "700px",
-        width: "100%", maxHeight: "85vh", overflow: "auto",
-        boxShadow: "0 30px 80px rgba(0,0,0,0.4)"
+        background: "#fff", borderRadius: "12px", maxWidth: "800px",
+        width: "100%", maxHeight: "90vh", overflow: "hidden",
+        boxShadow: "0 30px 80px rgba(0,0,0,0.4)", display: "flex", flexDirection: "column"
       }} onClick={e => e.stopPropagation()}>
-        <div style={{ background: "#0A0A0C", color: "#fff", padding: "24px 30px", borderRadius: "12px 12px 0 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ background: "#0A0A0C", color: "#fff", padding: "24px 30px", borderRadius: "12px 12px 0 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
           <div>
             <div style={{ color: "var(--Y)", fontSize: "11px", fontWeight: 700, letterSpacing: "2px", marginBottom: "4px" }}>JOB DESCRIPTION</div>
             <div style={{ fontFamily: "Orbitron, sans-serif", fontSize: "18px", fontWeight: 900 }}>{getJobIcon(job.title)} {job.title}</div>
           </div>
           <button onClick={onClose} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", width: "36px", height: "36px", borderRadius: "50%", fontSize: "18px", cursor: "pointer" }}>✕</button>
         </div>
-        <div style={{ padding: "30px" }}>
+        <div style={{ padding: "30px", overflow: "auto", flex: 1 }}>
           <div style={{ display: "flex", gap: "10px", marginBottom: "24px", flexWrap: "wrap" }}>
             <span style={{ background: job.status === "Published" ? "#e6f9e6" : "#f3f3f3", color: job.status === "Published" ? "green" : "#666", padding: "4px 14px", borderRadius: "20px", fontSize: "11px", fontWeight: 800 }}>{job.status}</span>
             <span style={{ background: "#fff3cd", color: "#856404", padding: "4px 14px", borderRadius: "20px", fontSize: "11px", fontWeight: 700 }}>Exp: {job.minExperience} – {job.maxExperience} Yrs</span>
@@ -76,9 +104,18 @@ function JDModal({ job, onClose }) {
             </div>
           )}
           {job.jdFileUrl && (
-            <a href={getFullUrl(job.jdFileUrl)} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#0A0A0C", color: "#fff", padding: "12px 24px", borderRadius: "6px", fontFamily: "Exo 2, sans-serif", fontWeight: 700, fontSize: "13px", textDecoration: "none", marginTop: "10px" }}>
-              📄 Download Full JD (PDF/DOC)
-            </a>
+            <div style={{ marginTop: "10px" }}>
+              <div style={{ fontFamily: "Orbitron, sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "2px", color: "#888", marginBottom: "10px" }}>JD DOCUMENT</div>
+              {isDoc ? (
+                <iframe
+                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(rawUrl)}`}
+                  style={{ width: "100%", height: "600px", border: "1px solid #ddd", borderRadius: "8px" }}
+                  title="Job Description"
+                />
+              ) : (
+                <PDFViewer url={rawUrl} />
+              )}
+            </div>
           )}
         </div>
       </div>

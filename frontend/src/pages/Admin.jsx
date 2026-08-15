@@ -7,17 +7,10 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const getFullUrl = (url) => {
    if (!url) return '';
-   let finalUrl = url;
    if (url.startsWith('http')) {
-       finalUrl = url.replace(/^http:\/\//i, 'https://');
-   } else {
-       const cleanPath = url.replace(/^\//, '');
-       finalUrl = `${API_BASE_URL}/${cleanPath}`;
+       return url.replace(/^http:\/\//i, 'https://');
    }
-   if (finalUrl.includes('cloudinary.com')) {
-       finalUrl = `${API_BASE_URL}/api/view-file?url=${encodeURIComponent(finalUrl)}`;
-   }
-   return finalUrl;
+   return `${API_BASE_URL}/${url.replace(/^\//, '')}`;
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -63,6 +56,7 @@ function Admin() {
    // Forgot Password States
    const [authMode, setAuthMode] = useState("login"); // 'login' or 'forgot'
    const [forgotEmail, setForgotEmail] = useState("");
+   const [previewResume, setPreviewResume] = useState(null);
 
    // eslint-disable-next-line no-unused-vars
    const navigate = useNavigate();
@@ -355,7 +349,7 @@ function Admin() {
                               </div>
                               <div style={{ position: "relative" }}>
                                  <i className="fas fa-lock" style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "#999" }}></i>
-                                 <input type={showPassword ? "text" : "password"} value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="••••••••" style={{ width: "100%", padding: "16px 48px 16px 48px", borderRadius: "12px", border: "1.5px solid #eee", fontSize: "15px", outline: "none", transition: "0.3s" }} required className="auth-field" />
+                                 <input type={showPassword ? "text" : "password"} value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" style={{ width: "100%", padding: "16px 48px 16px 48px", borderRadius: "12px", border: "1.5px solid #eee", fontSize: "15px", outline: "none", transition: "0.3s" }} required className="auth-field" />
                                  <i className={`far ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", color: "#999", cursor: "pointer" }}></i>
                               </div>
                            </div>
@@ -667,79 +661,24 @@ function Admin() {
                            </thead>
                            <tbody>
                               {students.map(s => (
-                                 <tr key={s._id} className="preview-row" style={{ background: "#fff", transition: "0.2s" }}>
-                                    <td style={{ padding: "18px 25px", borderRadius: "12px 0 0 12px" }}>
-                                       <div style={{ fontWeight: 800, fontSize: "15px" }}>{s.name}</div>
-                                       <div style={{ fontSize: "12px", color: "#888" }}>{s.email}</div>
-                                    </td>
-                                    <td style={{ padding: "18px 25px", fontSize: "14px", fontWeight: 600 }}>{s.appliedRole}</td>
-                                    <td style={{ padding: "18px 25px", textAlign: "center" }}>
-                                       <span style={{ padding: "8px 16px", borderRadius: "100px", background: s.atsScore > 75 ? "#f1fdf4" : "#fefce8", color: s.atsScore > 75 ? "#16a34a" : "#047225", fontWeight: 900, fontSize: "12px" }}>{s.atsScore}% </span>
-                                    </td>
-                                    <td style={{ padding: "18px 25px", textAlign: "center", borderRadius: "0 12px 12px 0" }}>
-                                       <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-                                          <a href={getFullUrl(s.resumeUrl)} target="_blank" rel="noreferrer" title="View CV" style={{ padding: "10px", color: "var(--primary)", background: "var(--primary-light)", borderRadius: "10px", fontSize: "14px" }}><i className="fas fa-file-pdf"></i></a>
-                                          <button
-                                             onClick={async () => {
-                                                if (window.confirm(`Send selection email to ${s.name}?`)) {
-                                                   setLoading(true);
-                                                   const resp = await fetch(`${API_BASE_URL}/api/admin/send-selection-email`, {
-                                                      method: 'POST',
-                                                      headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-                                                      body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name })
-                                                   });
-                                                   const res = await resp.json();
-                                                   if (res.success) notify('success', res.message);
-                                                   else notify('error', res.message);
-                                                   setLoading(false);
-                                                }
-                                             }}
-                                             title="Send Selection Mail"
-                                             style={{ padding: "10px", border: "none", background: "#ecfdf5", color: "#10b981", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}
-                                          ><i className="fas fa-paper-plane"></i></button>
-                                          <button
-                                             onClick={async () => {
-                                                if (window.confirm(`Send rejection email to ${s.name}?`)) {
-                                                   setLoading(true);
-                                                   const resp = await fetch(`${API_BASE_URL}/api/admin/send-rejection-email`, {
-                                                      method: 'POST',
-                                                      headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-                                                      body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name })
-                                                   });
-                                                   const res = await resp.json();
-                                                   if (res.success) notify('success', res.message);
-                                                   else notify('error', res.message);
-                                                   setLoading(false);
-                                                }
-                                             }}
-                                             title="Send Rejection Mail"
-                                             style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#ef4444", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}
-                                          ><i className="fas fa-envelope-open-text"></i></button>
-                                          <button
-                                             onClick={async () => {
-                                                if (window.confirm(`Are you sure you want to completely remove ${s.name}?`)) {
-                                                   setLoading(true);
-                                                   try {
-                                                      const resp = await fetch(`${API_BASE_URL}/api/admin/students/${s._id}`, {
-                                                         method: 'DELETE',
-                                                         headers: { 'x-auth-token': token }
-                                                      });
-                                                      const res = await resp.json();
-                                                      if (res.success) notify('success', res.message);
-                                                      else notify('error', res.message);
-                                                      fetchData();
-                                                   } catch (err) {
-                                                      notify('error', 'Failed to remove candidate');
-                                                   }
-                                                   setLoading(false);
-                                                }
-                                             }}
-                                             title="Remove Candidate"
-                                             style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#b91c1c", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}
-                                          ><i className="fas fa-trash"></i></button>
-                                       </div>
-                                    </td>
-                                 </tr>
+                                  <tr key={s._id} className="preview-row" style={{ background: "#fff", transition: "0.2s" }}>
+                                     <td style={{ padding: "18px 25px", borderRadius: "12px 0 0 12px" }}>
+                                        <div style={{ fontWeight: 800, fontSize: "15px" }}>{s.name}</div>
+                                        <div style={{ fontSize: "12px", color: "#888" }}>{s.email}</div>
+                                     </td>
+                                     <td style={{ padding: "18px 25px", fontSize: "14px", fontWeight: 600 }}>{s.appliedRole}</td>
+                                     <td style={{ padding: "18px 25px", textAlign: "center" }}>
+                                        <span style={{ padding: "8px 16px", borderRadius: "100px", background: s.atsScore > 75 ? "#f1fdf4" : "#fefce8", color: s.atsScore > 75 ? "#16a34a" : "#047225", fontWeight: 900, fontSize: "12px" }}>{s.atsScore}% </span>
+                                     </td>
+                                     <td style={{ padding: "18px 25px", textAlign: "center", borderRadius: "0 12px 12px 0" }}>
+                                        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+                                           <button onClick={() => { window.open(getFullUrl(s.resumeUrl), '_blank', 'noopener,noreferrer'); }} title="View CV" style={{ padding: "10px", color: "var(--primary)", background: "var(--primary-light)", borderRadius: "10px", fontSize: "14px", border: "none", cursor: "pointer" }}><i className="fas fa-file-pdf"></i></button>
+                                           <button onClick={async () => { if (window.confirm(`Send selection email to ${s.name}?`)) { setLoading(true); const resp = await fetch(`${API_BASE_URL}/api/admin/send-selection-email`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': token }, body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name }) }); const res = await resp.json(); if (res.success) notify('success', res.message); else notify('error', res.message); setLoading(false); } }} title="Send Selection Mail" style={{ padding: "10px", border: "none", background: "#ecfdf5", color: "#10b981", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}><i className="fas fa-paper-plane"></i></button>
+                                           <button onClick={async () => { if (window.confirm(`Send rejection email to ${s.name}?`)) { setLoading(true); const resp = await fetch(`${API_BASE_URL}/api/admin/send-rejection-email`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': token }, body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name }) }); const res = await resp.json(); if (res.success) notify('success', res.message); else notify('error', res.message); setLoading(false); } }} title="Send Rejection Mail" style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#ef4444", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}><i className="fas fa-envelope-open-text"></i></button>
+                                           <button onClick={async () => { if (window.confirm(`Are you sure you want to completely remove ${s.name}?`)) { setLoading(true); try { const resp = await fetch(`${API_BASE_URL}/api/admin/students/${s._id}`, { method: 'DELETE', headers: { 'x-auth-token': token } }); const res = await resp.json(); if (res.success) notify('success', res.message); else notify('error', res.message); fetchData(); } catch (err) { notify('error', 'Failed to remove candidate'); } setLoading(false); } }} title="Remove Candidate" style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#b91c1c", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}><i className="fas fa-trash"></i></button>
+                                        </div>
+                                     </td>
+                                  </tr>
                               ))}
                            </tbody>
                         </table>
@@ -1059,6 +998,20 @@ function Admin() {
          <footer style={{ padding: "40px", textAlign: "center", borderTop: "1.5px solid #f0f0f0", background: "#fff", fontSize: "12px", fontWeight: 700, color: "#999", letterSpacing: "1px" }}>
             &copy; 2026 RAITOOPTO &bull; PROFESSIONAL MANAGEMENT PLATFORM
          </footer>
+
+         {previewResume && (
+            <div onClick={() => setPreviewResume(null)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+               <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: "12px", maxWidth: "800px", width: "100%", maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+                  <div style={{ background: "#0A0A0C", color: "#fff", padding: "16px 24px", borderRadius: "12px 12px 0 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                     <span style={{ fontWeight: 800, fontSize: "14px" }}>Resume Preview</span>
+                     <button onClick={() => setPreviewResume(null)} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", width: "32px", height: "32px", borderRadius: "50%", fontSize: "16px", cursor: "pointer" }}>âœ•</button>
+                  </div>
+                  <div style={{ flex: 1, overflow: "auto", padding: "10px" }}>
+                     <iframe src={getFullUrl(previewResume)} style={{ width: "100%", height: "75vh", border: "none" }} title="Resume" />
+                  </div>
+               </div>
+            </div>
+         )}
       </div>
    );
 }

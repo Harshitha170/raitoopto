@@ -24,7 +24,17 @@ const SECRET = process.env.JWT_SECRET || 'LASER_EXPERT_SECRET_KEY';
 
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve uploaded files with absolute path
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    const ext = path.extname(filePath).toLowerCase();
+    if (ext === '.pdf') {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline');
+    } else if (ext === '.doc' || ext === '.docx') {
+      res.setHeader('Content-Disposition', 'inline');
+    }
+  }
+}));
 
 // --- EMAIL TRANSPORTER ---
 const transporter = nodemailer.createTransport({
@@ -170,7 +180,13 @@ if (useCloudinary) {
     params: {
       folder: 'lei-resumes',
       resource_type: 'raw',
-      allowed_formats: ['pdf', 'doc', 'docx']
+      allowed_formats: ['pdf', 'doc', 'docx'],
+      format: (req, file) => path.extname(file.originalname).replace('.', ''),
+      public_id: (req, file) => {
+        const ext = path.extname(file.originalname);
+        const name = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
+        return `${name}-${Date.now()}${ext}`;
+      }
     }
   });
 
@@ -1025,6 +1041,16 @@ app.get('/api/admin/db-health', authenticateAdmin, async (req, res) => {
 });
 
 // --- PDF VIEWER PROXY (forces inline display) ---
+const MIME_TYPES = {
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+    '.png': 'image/png', '.gif': 'image/gif',
+    '.webp': 'image/webp', '.svg': 'image/svg+xml',
+    '.mp4': 'video/mp4', '.webm': 'video/webm'
+};
+
 app.get('/api/view-file', async (req, res) => {
     try {
         const fileUrl = req.query.url;
@@ -1033,10 +1059,13 @@ app.get('/api/view-file', async (req, res) => {
         const response = await fetch(fileUrl);
         if (!response.ok) return res.status(response.status).json({ message: 'Failed to fetch file' });
 
-        const contentType = response.headers.get('content-type') || 'application/octet-stream';
+        const ext = fileUrl.match(/\.[a-zA-Z0-9]+(\?|$)/)?.[0]?.replace(/\?.*/, '')?.toLowerCase() || '.pdf';
+        const contentType = MIME_TYPES[ext] || response.headers.get('content-type') || 'application/pdf';
+
         res.setHeader('Content-Type', contentType);
         res.setHeader('Content-Disposition', 'inline');
         res.setHeader('Cache-Control', 'public, max-age=31536000');
+        res.setHeader('Access-Control-Allow-Origin', '*');
 
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
