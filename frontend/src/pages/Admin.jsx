@@ -8,14 +8,11 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const getFullUrl = (url) => {
    if (!url) return '';
    let finalUrl = url;
-   if (url.startsWith('http') && !url.includes('localhost:5000')) {
+   if (url.startsWith('http')) {
        finalUrl = url.replace(/^http:\/\//i, 'https://');
    } else {
-       const cleanPath = url.replace(/^https?:\/\/[^/]+\//, '').replace(/^\//, '');
+       const cleanPath = url.replace(/^\//, '');
        finalUrl = `${API_BASE_URL}/${cleanPath}`;
-   }
-   if (finalUrl.includes('cloudinary.com') && !finalUrl.match(/\.[a-zA-Z0-9]+$/)) {
-       finalUrl += '.pdf';
    }
    return finalUrl;
 };
@@ -41,7 +38,7 @@ function Admin() {
    const [activeJobId, setActiveJobId] = useState(null);
    // eslint-disable-next-line no-unused-vars
    const [jobQuestions, setJobQuestions] = useState([]);
-   const [jobQForm, setJobQForm] = useState({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: 0, isMandatory: true });
+   const [jobQForm, setJobQForm] = useState({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: '', isMandatory: true });
    // eslint-disable-next-line no-unused-vars
    const [viewState, setViewState] = useState('list');
    const [editingQId, setEditingQId] = useState(null);
@@ -846,35 +843,40 @@ function Admin() {
                            </div>
                         </div>
                         <div style={{ display: "flex", gap: "10px", marginTop: "25px" }}>
-                           <button
+                            <button
                               onClick={async () => {
                                  setLoading(true);
-                                 const fd = new FormData();
-                                 fd.append("title", jobForm.title);
-                                 fd.append("description", jobForm.description);
-                                 fd.append("responsibilities", jobForm.responsibilities);
-                                 fd.append("skills", jobForm.skills);
-                                 fd.append("minExperience", jobForm.minExperience);
-                                 fd.append("maxExperience", jobForm.maxExperience);
-                                 fd.append("status", jobForm.status);
-                                 if (jdFile) fd.append("jdFile", jdFile);
+                                 try {
+                                    const fd = new FormData();
+                                    fd.append("title", jobForm.title);
+                                    fd.append("description", jobForm.description);
+                                    fd.append("responsibilities", jobForm.responsibilities);
+                                    fd.append("skills", jobForm.skills);
+                                    fd.append("minExperience", jobForm.minExperience);
+                                    fd.append("maxExperience", jobForm.maxExperience);
+                                    fd.append("status", jobForm.status);
+                                    if (jdFile) fd.append("jdFile", jdFile);
 
-                                 const url = editingJobId ? `${API_BASE_URL}/api/admin/jobs/${editingJobId}` : `${API_BASE_URL}/api/admin/jobs`;
-                                 const method = editingJobId ? 'PUT' : 'POST';
+                                    const url = editingJobId ? `${API_BASE_URL}/api/admin/jobs/${editingJobId}` : `${API_BASE_URL}/api/admin/jobs`;
+                                    const method = editingJobId ? 'PUT' : 'POST';
 
-                                 const resp = await fetch(url, {
-                                    method: method,
-                                    headers: { 'x-auth-token': token },
-                                    body: fd
-                                 });
-                                 if (resp.ok) {
-                                    notify('success', editingJobId ? "Job updated." : "New job published.");
-                                    setJobForm({ title: "", description: "", responsibilities: "", skills: "", minExperience: 0, maxExperience: 0, status: 'Published' });
-                                    setJdFile(null);
-                                    setEditingJobId(null);
-                                    fetchData();
-                                 } else {
-                                    notify('error', "Failed to sync job.");
+                                    const resp = await fetch(url, {
+                                       method: method,
+                                       headers: { 'x-auth-token': token },
+                                       body: fd
+                                    });
+                                    if (resp.ok) {
+                                       notify('success', editingJobId ? "Job updated." : "New job published.");
+                                       setJobForm({ title: "", description: "", responsibilities: "", skills: "", minExperience: 0, maxExperience: 0, status: 'Published' });
+                                       setJdFile(null);
+                                       setEditingJobId(null);
+                                       fetchData();
+                                    } else {
+                                       const errData = await resp.json().catch(() => ({}));
+                                       notify('error', errData.message || "Failed to sync job.");
+                                    }
+                                 } catch (err) {
+                                    notify('error', "Failed to connect to server. Please check backend status.");
                                  }
                                  setLoading(false);
                               }}
@@ -906,51 +908,99 @@ function Admin() {
                                        <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#999", marginBottom: "8px" }}>{editingQId ? "Edit Question" : "Add New Question"}</label>
                                        <input type="text" placeholder="Question text..." className="input-lite" value={jobQForm.questionText} onChange={e => setJobQForm({ ...jobQForm, questionText: e.target.value })} />
                                     </div>
-                                    <div>
-                                       <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#999", marginBottom: "8px" }}>Type</label>
-                                       <select className="input-lite" value={jobQForm.questionType} onChange={e => setJobQForm({ ...jobQForm, questionType: e.target.value })}>
-                                          <option value="text">Short Answer</option>
-                                          <option value="mcq">Multiple Choice</option>
-                                          <option value="boolean">True/False</option>
-                                       </select>
-                                    </div>
+                                     <div>
+                                        <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#999", marginBottom: "8px" }}>Type</label>
+                                        <select className="input-lite" value={jobQForm.questionType} onChange={e => {
+                                           const newType = e.target.value;
+                                           const defaultCorrect = newType === 'mcq' ? 0 : newType === 'boolean' ? 'Yes' : '';
+                                           setJobQForm({ ...jobQForm, questionType: newType, correctAnswer: defaultCorrect });
+                                        }}>
+                                           <option value="text">Short Answer</option>
+                                           <option value="mcq">Multiple Choice</option>
+                                           <option value="boolean">True/False</option>
+                                        </select>
+                                     </div>
                                  </>
                               )}
                            </div>
 
-                           {activeJobId && jobQForm.questionType === 'mcq' && (
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
-                                 {jobQForm.options.map((opt, idx) => (
-                                    <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                                       <input type="radio" checked={jobQForm.correctAnswer === idx} onChange={() => setJobQForm({ ...jobQForm, correctAnswer: idx })} />
-                                       <input type="text" placeholder={`Option ${idx + 1}`} className="input-lite" value={opt} onChange={e => {
-                                          const newOpts = [...jobQForm.options];
-                                          newOpts[idx] = e.target.value;
-                                          setJobQForm({ ...jobQForm, options: newOpts });
-                                       }} />
-                                    </div>
-                                 ))}
-                              </div>
-                           )}
+                            {activeJobId && jobQForm.questionType === 'mcq' && (
+                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px" }}>
+                                  {jobQForm.options.map((opt, idx) => (
+                                     <div key={idx} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                                        <input type="radio" checked={jobQForm.correctAnswer === idx} onChange={() => setJobQForm({ ...jobQForm, correctAnswer: idx })} />
+                                        <input type="text" placeholder={`Option ${idx + 1}`} className="input-lite" value={opt} onChange={e => {
+                                           const newOpts = [...jobQForm.options];
+                                           newOpts[idx] = e.target.value;
+                                           setJobQForm({ ...jobQForm, options: newOpts });
+                                        }} />
+                                     </div>
+                                  ))}
+                               </div>
+                            )}
+
+                            {activeJobId && jobQForm.questionType === 'text' && (
+                               <div>
+                                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#999", marginBottom: "8px" }}>Correct Answer</label>
+                                  <input type="text" placeholder="Enter the expected correct answer..." className="input-lite" value={jobQForm.correctAnswer || ''} onChange={e => setJobQForm({ ...jobQForm, correctAnswer: e.target.value })} />
+                                  <p style={{ fontSize: "11px", color: "#999", marginTop: "6px" }}>Student answers will be matched (case-insensitive, trimmed).</p>
+                               </div>
+                            )}
+
+                            {activeJobId && jobQForm.questionType === 'boolean' && (
+                               <div>
+                                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#999", marginBottom: "8px" }}>Correct Answer</label>
+                                  <div style={{ display: "flex", gap: "15px" }}>
+                                     <label style={{ display: "flex", gap: "8px", alignItems: "center", padding: "10px 20px", borderRadius: "8px", border: `1.5px solid ${jobQForm.correctAnswer === 'Yes' ? 'var(--primary)' : '#ddd'}`, background: jobQForm.correctAnswer === 'Yes' ? 'var(--primary-light)' : '#fff', cursor: "pointer", fontWeight: 700, fontSize: "13px" }}>
+                                        <input type="radio" name="boolAnswer" value="Yes" checked={jobQForm.correctAnswer === 'Yes'} onChange={() => setJobQForm({ ...jobQForm, correctAnswer: 'Yes' })} style={{ display: "none" }} /> Yes
+                                     </label>
+                                     <label style={{ display: "flex", gap: "8px", alignItems: "center", padding: "10px 20px", borderRadius: "8px", border: `1.5px solid ${jobQForm.correctAnswer === 'No' ? 'var(--primary)' : '#ddd'}`, background: jobQForm.correctAnswer === 'No' ? 'var(--primary-light)' : '#fff', cursor: "pointer", fontWeight: 700, fontSize: "13px" }}>
+                                        <input type="radio" name="boolAnswer" value="No" checked={jobQForm.correctAnswer === 'No'} onChange={() => setJobQForm({ ...jobQForm, correctAnswer: 'No' })} style={{ display: "none" }} /> No
+                                     </label>
+                                  </div>
+                               </div>
+                            )}
 
                            {activeJobId && (
                               <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-                                 <button onClick={async () => {
-                                    const url = editingQId ? `${API_BASE_URL}/api/admin/questions/${editingQId}` : `${API_BASE_URL}/api/admin/jobs/${activeJobId}/questions`;
-                                    const method = editingQId ? 'PUT' : 'POST';
-                                    const resp = await fetch(url, {
-                                       method: method,
-                                       headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-                                       body: JSON.stringify(jobQForm)
-                                    });
-                                    if (resp.ok) {
-                                       notify('success', editingQId ? "Question updated." : "Question added.");
-                                       setJobQForm({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: 0, isMandatory: true });
-                                       setEditingQId(null);
-                                       fetchData();
+                               <button onClick={async () => {
+                                     try {
+                                        if (!jobQForm.questionText.trim()) {
+                                           notify('error', "Please enter a question.");
+                                           return;
+                                        }
+                                        if (jobQForm.questionType === 'mcq' && jobQForm.options.some(o => !o.trim())) {
+                                           notify('error', "Please fill in all MCQ options.");
+                                           return;
+                                        }
+                                        if (jobQForm.questionType === 'text' && !(jobQForm.correctAnswer || '').trim()) {
+                                           notify('error', "Please enter the correct answer for this question.");
+                                           return;
+                                        }
+                                        if (jobQForm.questionType === 'boolean' && !jobQForm.correctAnswer) {
+                                           notify('error', "Please select the correct answer (Yes or No).");
+                                           return;
+                                        }
+                                        const url = editingQId ? `${API_BASE_URL}/api/admin/questions/${editingQId}` : `${API_BASE_URL}/api/admin/jobs/${activeJobId}/questions`;
+                                       const method = editingQId ? 'PUT' : 'POST';
+                                       const resp = await fetch(url, {
+                                          method: method,
+                                          headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                                          body: JSON.stringify(jobQForm)
+                                       });
+                                       if (resp.ok) {
+                                          notify('success', editingQId ? "Question updated." : "Question added.");
+                                           setJobQForm({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: '', isMandatory: true });
+                                           setEditingQId(null);
+                                           fetchData();
+                                       } else {
+                                          notify('error', "Failed to save question.");
+                                       }
+                                    } catch (err) {
+                                       notify('error', "Failed to connect to server.");
                                     }
                                  }} className="btn-lite btn-lite-primary">{editingQId ? "Update Question" : "Save Question"}</button>
-                                 {editingQId && <button onClick={() => { setEditingQId(null); setJobQForm({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: 0, isMandatory: true }); }} className="btn-lite">Cancel</button>}
+                                  {editingQId && <button onClick={() => { setEditingQId(null); setJobQForm({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: '', isMandatory: true }); }} className="btn-lite">Cancel</button>}
                               </div>
                            )}
 
@@ -963,12 +1013,16 @@ function Admin() {
                                           <div style={{ fontSize: "14px", fontWeight: 600 }}>{q.questionText} <span style={{ fontSize: "10px", color: "#999", background: "#eee", padding: "2px 6px", borderRadius: "4px", marginLeft: "10px" }}>{q.questionType.toUpperCase()}</span></div>
                                           <div style={{ display: "flex", gap: "10px" }}>
                                              <button onClick={() => { setEditingQId(q._id); setJobQForm(q); }} style={{ background: "none", border: "none", color: "var(--primary)", cursor: "pointer", fontWeight: 700 }}>Edit</button>
-                                             <button onClick={async () => {
-                                                if (window.confirm("Delete this question?")) {
-                                                   await fetch(`${API_BASE_URL}/api/admin/questions/${q._id}`, { method: 'DELETE', headers: { 'x-auth-token': token } });
-                                                   fetchData();
-                                                }
-                                             }} style={{ background: "none", border: "none", color: "#e03131", cursor: "pointer", fontWeight: 700 }}>Delete</button>
+                                              <button onClick={async () => {
+                                                 if (window.confirm("Delete this question?")) {
+                                                    try {
+                                                       await fetch(`${API_BASE_URL}/api/admin/questions/${q._id}`, { method: 'DELETE', headers: { 'x-auth-token': token } });
+                                                       fetchData();
+                                                    } catch (err) {
+                                                       notify('error', "Failed to delete question.");
+                                                    }
+                                                 }
+                                              }} style={{ background: "none", border: "none", color: "#e03131", cursor: "pointer", fontWeight: 700 }}>Delete</button>
                                           </div>
                                        </div>
                                     ))}

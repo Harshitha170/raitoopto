@@ -6,14 +6,11 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const getFullUrl = (url) => {
    if (!url) return '';
    let finalUrl = url;
-   if (url.startsWith('http') && !url.includes('localhost:5000')) {
+   if (url.startsWith('http')) {
        finalUrl = url.replace(/^http:\/\//i, 'https://');
    } else {
-       const cleanPath = url.replace(/^https?:\/\/[^/]+\//, '').replace(/^\//, '');
+       const cleanPath = url.replace(/^\//, '');
        finalUrl = `${API_BASE_URL}/${cleanPath}`;
-   }
-   if (finalUrl.includes('cloudinary.com') && !finalUrl.match(/\.[a-zA-Z0-9]+$/)) {
-       finalUrl += '.pdf';
    }
    return finalUrl;
 };

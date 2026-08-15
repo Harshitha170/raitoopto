@@ -158,6 +158,7 @@ cloudinary.config({
 });
 
 const useCloudinary = !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+console.log(`Cloudinary mode: ${useCloudinary ? 'ENABLED (cloud: ' + process.env.CLOUDINARY_CLOUD_NAME + ')' : 'DISABLED (using local disk)'}`);
 
 // --- MULTER SETUP ---
 let storage;
@@ -168,7 +169,8 @@ if (useCloudinary) {
     cloudinary: cloudinary,
     params: {
       folder: 'lei-resumes',
-      resource_type: 'auto'
+      resource_type: 'raw',
+      allowed_formats: ['pdf', 'doc', 'docx']
     }
   });
 
@@ -439,7 +441,7 @@ app.post('/api/career/apply', upload.single('resume'), async (req, res) => {
     const studentData = {
       name,
       email,
-      resumeUrl: process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`,
+      resumeUrl: req.file.path,
       appliedRole: jobRole,
       appliedJobId: jobId,
       jobResponses: parsedResponses,
@@ -448,6 +450,7 @@ app.post('/api/career/apply', upload.single('resume'), async (req, res) => {
       correctCount: savedCorrectCount,
       totalQuestions: savedTotalQuestions
     };
+    console.log("Resume uploaded:", req.file.path);
 
     let student;
     if (isMockMode) {
@@ -689,11 +692,12 @@ app.post('/api/admin/gallery/upload', authenticateAdmin, galleryUpload.single('i
     
     const contentType = req.file.mimetype.startsWith('video') ? 'video' : 'image';
     const itemData = {
-      imageUrl: process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`,
+      imageUrl: req.file.path,
       caption: req.body.caption,
       category: req.body.category,
       contentType: contentType
     };
+    console.log("Gallery file uploaded:", req.file.path);
     
     if(isMockMode) {
         const item = await DB.Gallery.save(itemData);
@@ -710,20 +714,32 @@ app.post('/api/admin/gallery/upload', authenticateAdmin, galleryUpload.single('i
 
 // f. GALLERY MANAGEMENT - DELETE
 app.delete('/api/admin/gallery/:id', authenticateAdmin, async (req, res) => {
-    await DB.Gallery.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await DB.Gallery.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete gallery item' });
+    }
 });
 
 // g. GALLERY MANAGEMENT - UPDATE
 app.put('/api/admin/gallery/:id', authenticateAdmin, async (req, res) => {
-    await DB.Gallery.findByIdAndUpdate(req.params.id, req.body);
-    res.json({ success: true });
+    try {
+        await DB.Gallery.findByIdAndUpdate(req.params.id, req.body);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to update gallery item' });
+    }
 });
 
 // h. JOB QUESTIONS - UPDATE
 app.put('/api/admin/questions/:id', authenticateAdmin, async (req, res) => {
-    await DB.JobQuestion.findByIdAndUpdate(req.params.id, req.body);
-    res.json({ success: true });
+    try {
+        await DB.JobQuestion.findByIdAndUpdate(req.params.id, req.body);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to update question' });
+    }
 });
 
 // i. JOB ROLES - FETCH (Public)
@@ -754,29 +770,44 @@ app.get('/api/admin/jobs/:id', authenticateAdmin, async (req, res) => {
 
 // l. ADMIN JOB - CREATE
 app.post('/api/admin/jobs', authenticateAdmin, jdUpload.single('jdFile'), async (req, res) => {
-  const jobData = { ...req.body };
-  if (req.file) {
-    jobData.jdFileUrl = process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`;
-  }
-  
-  if (isMockMode) {
-    const job = await DB.JobRole.save(jobData);
-    res.json(job);
-  } else {
-    const newJob = new DB.JobRole(jobData);
-    await newJob.save();
-    res.json(newJob);
+  try {
+    const jobData = { ...req.body };
+    if (req.file) {
+      jobData.jdFileUrl = req.file.path;
+      console.log("JD File uploaded:", req.file.path);
+    } else {
+      console.log("No JD file attached to job creation.");
+    }
+    
+    if (isMockMode) {
+      const job = await DB.JobRole.save(jobData);
+      res.json(job);
+    } else {
+      const newJob = new DB.JobRole(jobData);
+      await newJob.save();
+      console.log("Job created with jdFileUrl:", newJob.jdFileUrl || 'none');
+      res.json(newJob);
+    }
+  } catch (err) {
+    console.error("Job Create Error:", err.message);
+    res.status(500).json({ message: 'Failed to create job: ' + err.message });
   }
 });
 
 // m. ADMIN JOB - UPDATE
 app.put('/api/admin/jobs/:id', authenticateAdmin, jdUpload.single('jdFile'), async (req, res) => {
-    const updates = { ...req.body };
-    if (req.file) {
-        updates.jdFileUrl = process.env.CLOUDINARY_CLOUD_NAME ? req.file.path : `uploads/${req.file.filename}`;
+    try {
+        const updates = { ...req.body };
+        if (req.file) {
+            updates.jdFileUrl = req.file.path;
+            console.log("JD File updated:", req.file.path);
+        }
+        await DB.JobRole.findByIdAndUpdate(req.params.id, updates);
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Job Update Error:", err.message);
+        res.status(500).json({ message: 'Failed to update job: ' + err.message });
     }
-    await DB.JobRole.findByIdAndUpdate(req.params.id, updates);
-    res.json({ success: true });
 });
 
 // n. JOB - DELETE
@@ -797,26 +828,48 @@ app.delete('/api/admin/jobs/:id', authenticateAdmin, async (req, res) => {
 
 // n2. JOB QUESTIONS - GET (Public - Hides Correct Answer)
 app.get('/api/jobs/:jobId/questions', async (req, res) => {
-    const questions = await DB.JobQuestion.find({ jobId: req.params.jobId }).select('-correctAnswer');
-    res.json(questions);
+    try {
+        const questions = await DB.JobQuestion.find({ jobId: req.params.jobId }).select('-correctAnswer');
+        res.json(questions);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch questions' });
+    }
 });
 
 // n2. JOB QUESTIONS - GET (Admin - Returns Correct Answer)
 app.get('/api/admin/jobs/:jobId/questions', authenticateAdmin, async (req, res) => {
-    const questions = await DB.JobQuestion.find({ jobId: req.params.jobId });
-    res.json(questions);
+    try {
+        const questions = await DB.JobQuestion.find({ jobId: req.params.jobId });
+        res.json(questions);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch questions' });
+    }
 });
 
 // o. JOB QUESTIONS - ADD
 app.post('/api/admin/jobs/:jobId/questions', authenticateAdmin, async (req, res) => {
-    const qData = { ...req.body, jobId: req.params.jobId };
-    if (isMockMode) {
-        const q = await DB.JobQuestion.save(qData);
-        res.json(q);
-    } else {
-        const q = new DB.JobQuestion(qData);
-        await q.save();
-        res.json(q);
+    try {
+        const { questionText, questionType, correctAnswer } = req.body;
+        if (!questionText || !questionText.trim()) {
+            return res.status(400).json({ message: 'Question text is required.' });
+        }
+        if (questionType === 'text' && (!correctAnswer || !correctAnswer.toString().trim())) {
+            return res.status(400).json({ message: 'Correct answer is required for Short Answer questions.' });
+        }
+        if (questionType === 'boolean' && !correctAnswer) {
+            return res.status(400).json({ message: 'Correct answer is required for True/False questions.' });
+        }
+        const qData = { ...req.body, jobId: req.params.jobId };
+        if (isMockMode) {
+            const q = await DB.JobQuestion.save(qData);
+            res.json(q);
+        } else {
+            const q = new DB.JobQuestion(qData);
+            await q.save();
+            res.json(q);
+        }
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to add question: ' + err.message });
     }
 });
 
@@ -837,8 +890,12 @@ app.put('/api/admin/questions/:id', authenticateAdmin, async (req, res) => {
 
 // p. JOB QUESTIONS - DELETE
 app.delete('/api/admin/questions/:id', authenticateAdmin, async (req, res) => {
-    await DB.JobQuestion.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await DB.JobQuestion.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete question' });
+    }
 });
 
 
@@ -965,6 +1022,18 @@ app.get('/api/admin/db-health', authenticateAdmin, async (req, res) => {
         const qCount = Array.isArray(questions) ? questions.length : (await DB.JobQuestion.countDocuments());
         res.json({ jobs: jCount, questions: qCount, isMock: isMockMode });
     } catch(err) { res.status(500).send(err.message); }
+});
+
+// --- GLOBAL ERROR HANDLER ---
+app.use((err, req, res, next) => {
+    console.error("Unhandled Error:", err.message);
+    if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ message: 'File too large. Maximum size is 10MB.' });
+    }
+    if (err.message && err.message.includes('Only')) {
+        return res.status(400).json({ message: err.message });
+    }
+    res.status(500).json({ message: 'Internal server error: ' + err.message });
 });
 
 // START SERVER
