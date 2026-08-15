@@ -37,12 +37,20 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 }));
 
 // --- EMAIL TRANSPORTER ---
+const emailUser = (process.env.EMAIL_USER || 'harshuchethu3@gmail.com').trim();
+const emailPass = (process.env.EMAIL_PASS || 'gychdfekijpkaymz').replace(/\s+/g, '');
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER || 'harshuchethu3@gmail.com',
-    pass: (process.env.EMAIL_PASS || 'gychdfekijpkaymz').replace(/\s+/g, '')
+    user: emailUser,
+    pass: emailPass
   },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 20000,
   tls: {
     rejectUnauthorized: false
   }
@@ -305,7 +313,7 @@ app.post('/api/admin/forgot-password', async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL || 'https://raitoopto.netlify.app'}/reset-password/${token}`;
     
     const mailOptions = {
-      from: '"Laser Experts India" <harshuchethu3@gmail.com>',
+      from: `"Laser Experts India" <${emailUser}>`,
       to: admin.email,
       subject: 'Password Reset Request',
       html: `
@@ -601,7 +609,7 @@ app.post('/api/admin/send-selection-email', authenticateAdmin, async (req, res) 
         console.log(`Sending Interview Selection email to: ${email} (${name})`);
 
         const mailOptions = {
-            from: '"Laser Experts India" <harshuchethu3@gmail.com>',
+            from: `"Laser Experts India" <${emailUser}>`,
             to: email,
             subject: 'Interview Selection - Laser Experts India',
             html: `
@@ -661,7 +669,7 @@ app.post('/api/admin/send-rejection-email', authenticateAdmin, async (req, res) 
         console.log(`Sending Interview Rejection email to: ${email} (${name})`);
 
         const mailOptions = {
-            from: '"Laser Experts India" <harshuchethu3@gmail.com>',
+            from: `"Laser Experts India" <${emailUser}>`,
             to: email,
             subject: 'Application Status Update - Laser Experts India',
             html: `
@@ -1067,8 +1075,13 @@ const MIME_TYPES = {
 
 app.get('/api/view-file', async (req, res) => {
     try {
-        let fileUrl = (req.query.url || '').trim();
-        if (!fileUrl) return res.status(400).json({ message: 'URL parameter required' });
+        let rawUrl = (req.query.url || '').trim();
+        let fileUrl = decodeURIComponent(rawUrl);
+        console.log('Proxy view-file request for URL:', fileUrl);
+
+        if (!fileUrl) {
+            return res.status(400).json({ message: 'URL parameter required' });
+        }
 
         // If local file path or points to uploads folder
         if (!fileUrl.startsWith('http') || fileUrl.includes('/uploads/')) {
@@ -1088,28 +1101,139 @@ app.get('/api/view-file', async (req, res) => {
             return res.status(404).json({ message: 'File not found on server' });
         }
 
-        const response = await fetch(fileUrl, { redirect: 'follow' });
-        if (!response.ok) {
-            console.warn(`File proxy fetch returned ${response.status} for ${fileUrl}`);
-            return res.redirect(fileUrl);
+        // If this is a Cloudinary URL and we have Cloudinary configured, use SDK/auth to download
+        let authHeader = null;
+        if (fileUrl.includes('res.cloudinary.com') && useCloudinary) {
+            try {
+                // For Cloudinary authenticated requests, we can provide Basic auth header with API Key & Secret
+                const authStr = `${process.env.CLOUDINARY_API_KEY}:${process.env.CLOUDINARY_API_SECRET}`;
+                authHeader = 'Basic ' + Buffer.from(authStr).toString('base64');
+
+                const urlParts = fileUrl.split('/upload/');
+                if (urlParts.length === 2) {
+                    let fullPublicId = urlParts[1].replace(/^v\d+\//, ''); // remove version (e.g. v1786813371/)
+                    const isRaw = fileUrl.includes('/raw/');
+                    
+                    // For raw files in Cloudinary, public_id retains its extension
+                    // For image files, extension is separated
+                    const extMatch = fullPublicId.match(/\.([a-zA-Z0-9]+)$/);
+                    const fileFormat = extMatch ? extMatch[1] : 'pdf';
+                    const publicIdWithoutExt = fullPublicId.replace(/\.[^/.]+$/, '');
+
+                    console.log('Generating signed Cloudinary URL for:', fullPublicId);
+
+                    try {
+                        const privateUrl = cloudinary.utils.private_download_url(
+                            isRaw ? fullPublicId : publicIdWithoutExt,
+                            isRaw ? '' : fileFormat,
+                            { resource_type: isRaw ? 'raw' : 'image', type: 'upload', attachment: false }
+                        );
+                        if (privateUrl) {
+                            console.log('Private download URL created:', privateUrl);
+                            fileUrl = privateUrl;
+                        }
+                    } catch (pErr) {
+                        console.warn('private_download_url error:', pErr.message);
+                    }
+                }
+            } catch (sdkErr) {
+                console.warn('Cloudinary SDK sign failed:', sdkErr.message);
+            }
         }
 
-        const ext = fileUrl.match(/\.[a-zA-Z0-9]+(\?|$)/)?.[0]?.replace(/\?.*/, '')?.toLowerCase() || '.pdf';
-        const contentType = response.headers.get('content-type') || MIME_TYPES[ext] || 'application/pdf';
+        // Use Node.js built-in https module (works in ALL Node versions, no fetch needed)
+        const https = require('https');
+        const http = require('http');
+        
+        const fetchFile = (url, redirectCount = 0) => {
+            return new Promise((resolve, reject) => {
+                if (redirectCount > 5) return reject(new Error('Too many redirects'));
+                const client = url.startsWith('https') ? https : http;
+                const urlObj = new URL(url);
+                const options = {
+                    hostname: urlObj.hostname,
+                    path: urlObj.pathname + urlObj.search,
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                        'Accept': '*/*'
+                    }
+                };
 
-        res.setHeader('Content-Type', contentType);
+                // Add Cloudinary basic auth if fetching from Cloudinary and authHeader is present
+                if (urlObj.hostname.includes('cloudinary.com') && authHeader) {
+                    options.headers['Authorization'] = authHeader;
+                }
+
+                client.get(options, (response) => {
+                    // Follow redirects
+                    if ([301, 302, 303, 307, 308].includes(response.statusCode) && response.headers.location) {
+                        const redirectUrl = response.headers.location.startsWith('http') 
+                            ? response.headers.location 
+                            : new URL(response.headers.location, url).toString();
+                        return fetchFile(redirectUrl, redirectCount + 1).then(resolve).catch(reject);
+                    }
+                    if (response.statusCode !== 200) {
+                        return reject(new Error(`HTTP ${response.statusCode}`));
+                    }
+                    const chunks = [];
+                    response.on('data', chunk => chunks.push(chunk));
+                    response.on('end', () => {
+                        resolve({
+                            buffer: Buffer.concat(chunks),
+                            contentType: response.headers['content-type'] || 'application/pdf'
+                        });
+                    });
+                    response.on('error', reject);
+                }).on('error', reject);
+            });
+        };
+
+        // Build list of URLs to try (Cloudinary resource_type mismatch fix)
+        const urlsToTry = [fileUrl];
+        if (fileUrl.includes('res.cloudinary.com')) {
+            // If URL has /raw/upload, also try /image/upload (and vice versa)
+            if (fileUrl.includes('/raw/upload/')) {
+                urlsToTry.push(fileUrl.replace('/raw/upload/', '/image/upload/'));
+            } else if (fileUrl.includes('/image/upload/')) {
+                urlsToTry.push(fileUrl.replace('/image/upload/', '/raw/upload/'));
+            }
+        }
+
+        let result = null;
+        let lastError = null;
+        for (const tryUrl of urlsToTry) {
+            try {
+                console.log('Trying URL:', tryUrl);
+                result = await fetchFile(tryUrl);
+                break; // Success!
+            } catch (e) {
+                console.warn(`URL failed (${e.message}):`, tryUrl);
+                lastError = e;
+            }
+        }
+
+        if (!result) {
+            throw lastError || new Error('All URL variants failed');
+        }
+        
+        const ext = fileUrl.match(/\.[a-zA-Z0-9]+(\?|$)/)?.[0]?.replace(/\?.*/, '')?.toLowerCase() || '.pdf';
+        const contentType = result.contentType || MIME_TYPES[ext] || 'application/pdf';
+
+        // Force PDF content type for .pdf files
+        const finalContentType = ext === '.pdf' ? 'application/pdf' : contentType;
+
+        res.setHeader('Content-Type', finalContentType);
         res.setHeader('Content-Disposition', 'inline');
         res.setHeader('Cache-Control', 'public, max-age=31536000');
         res.setHeader('Access-Control-Allow-Origin', '*');
-
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        res.send(buffer);
+        res.send(result.buffer);
     } catch (err) {
         console.error("File proxy error:", err.message);
-        // Fallback: If fetch failed, redirect user to the raw URL directly
-        if (req.query.url && req.query.url.startsWith('http')) {
-            return res.redirect(req.query.url);
+        // Fallback: redirect user to the raw URL directly
+        const fallbackUrl = decodeURIComponent(req.query.url || '');
+        if (fallbackUrl.startsWith('http')) {
+            return res.redirect(fallbackUrl);
         }
         res.status(500).json({ message: 'Failed to load file: ' + err.message });
     }
