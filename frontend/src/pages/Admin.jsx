@@ -269,9 +269,15 @@ function Admin() {
 
    const deleteJob = async (id) => {
       if (!window.confirm("Are you sure?")) return;
-      await fetch(`${API_BASE_URL}/api/admin/jobs/${id}`, { method: "DELETE", headers: { "x-auth-token": token } });
-      notify('success', "Job deleted.");
-      fetchData();
+      try {
+         const resp = await fetch(`${API_BASE_URL}/api/admin/jobs/${id}`, { method: "DELETE", headers: { "x-auth-token": token } });
+         const res = await resp.json();
+         if (res.success) notify('success', "Job deleted.");
+         else notify('error', res.message || "Failed to delete job.");
+         fetchData();
+      } catch (err) {
+         notify('error', "Failed to delete job.");
+      }
    };
 
    // --- LOGIN PAGE ---

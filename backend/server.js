@@ -779,7 +779,23 @@ app.put('/api/admin/jobs/:id', authenticateAdmin, jdUpload.single('jdFile'), asy
     res.json({ success: true });
 });
 
-// n. JOB QUESTIONS - GET (Public - Hides Correct Answer)
+// n. JOB - DELETE
+app.delete('/api/admin/jobs/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (isMockMode) {
+      await DB.JobRole.remove(req.params.id);
+    } else {
+      await DB.JobRole.findByIdAndDelete(req.params.id);
+      // Also delete associated questions
+      await DB.JobQuestion.deleteMany({ jobId: req.params.id });
+    }
+    res.json({ success: true, message: 'Job deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete job' });
+  }
+});
+
+// n2. JOB QUESTIONS - GET (Public - Hides Correct Answer)
 app.get('/api/jobs/:jobId/questions', async (req, res) => {
     const questions = await DB.JobQuestion.find({ jobId: req.params.jobId }).select('-correctAnswer');
     res.json(questions);
