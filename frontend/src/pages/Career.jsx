@@ -3,6 +3,20 @@ import { Link } from "react-router-dom";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+const getFullUrl = (url) => {
+   if (!url) return '';
+   let finalUrl = url;
+   if (url.startsWith('http') && !url.includes('localhost:5000')) {
+       finalUrl = url.replace(/^http:\/\//i, 'https://');
+   } else {
+       const cleanPath = url.replace(/^https?:\/\/[^/]+\//, '').replace(/^\//, '');
+       finalUrl = `${API_BASE_URL}/${cleanPath}`;
+   }
+   if (finalUrl.includes('cloudinary.com') && !finalUrl.match(/\.[a-zA-Z0-9]+$/)) {
+       finalUrl += '.pdf';
+   }
+   return finalUrl;
+};
 
 function getJobIcon(title) {
   const t = (title || "").toLowerCase();
@@ -62,7 +76,7 @@ function JDModal({ job, onClose }) {
             </div>
           )}
           {job.jdFileUrl && (
-            <a href={job.jdFileUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#0A0A0C", color: "#fff", padding: "12px 24px", borderRadius: "6px", fontFamily: "Exo 2, sans-serif", fontWeight: 700, fontSize: "13px", textDecoration: "none", marginTop: "10px" }}>
+            <a href={getFullUrl(job.jdFileUrl)} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#0A0A0C", color: "#fff", padding: "12px 24px", borderRadius: "6px", fontFamily: "Exo 2, sans-serif", fontWeight: 700, fontSize: "13px", textDecoration: "none", marginTop: "10px" }}>
               📄 Download Full JD (PDF/DOC)
             </a>
           )}
@@ -247,7 +261,7 @@ function Career() {
                         fontSize: "12px", fontFamily: "Exo 2, sans-serif",
                         transition: "all 0.2s"
                       }}
-                        onMouseEnter={e => { e.target.borderColor = "var(--Y)"; e.target.style.borderColor = "#0A0A0C"; }}
+                        onMouseEnter={e => { e.target.style.borderColor = "var(--Y)"; }}
                         onMouseLeave={e => { e.target.style.borderColor = "#ddd"; }}
                       >📄 View JD</button>
                       <button onClick={() => {setActiveJob(j);setStep(2);}} className="btn-y" style={{ flex: 2, borderRadius: "6px" }}>Apply Now →</button>

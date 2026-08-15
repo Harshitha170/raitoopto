@@ -7,11 +7,20 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const getFullUrl = (url) => {
    if (!url) return '';
-   if (url.startsWith('http') && !url.includes('localhost:5000')) return url;
-   const cleanPath = url.replace(/^https?:\/\/[^\/]+\//, '').replace(/^\//, '');
-   return `${API_BASE_URL}/${cleanPath}`;
+   let finalUrl = url;
+   if (url.startsWith('http') && !url.includes('localhost:5000')) {
+       finalUrl = url.replace(/^http:\/\//i, 'https://');
+   } else {
+       const cleanPath = url.replace(/^https?:\/\/[^/]+\//, '').replace(/^\//, '');
+       finalUrl = `${API_BASE_URL}/${cleanPath}`;
+   }
+   if (finalUrl.includes('cloudinary.com') && !finalUrl.match(/\.[a-zA-Z0-9]+$/)) {
+       finalUrl += '.pdf';
+   }
+   return finalUrl;
 };
 
+// eslint-disable-next-line no-unused-vars
 const SOCIAL_LINKS = {
    facebook: "https://www.facebook.com/leibglr",
    instagram: "https://www.instagram.com/laser_expert",
@@ -30,8 +39,10 @@ function Admin() {
    const [jobForm, setJobForm] = useState({ title: "", description: "", responsibilities: "", skills: "", minExperience: 0, maxExperience: 0, status: 'Published' });
    const [jdFile, setJdFile] = useState(null);
    const [activeJobId, setActiveJobId] = useState(null);
+   // eslint-disable-next-line no-unused-vars
    const [jobQuestions, setJobQuestions] = useState([]);
    const [jobQForm, setJobQForm] = useState({ questionText: "", questionType: "text", options: ["", "", "", ""], correctAnswer: 0, isMandatory: true });
+   // eslint-disable-next-line no-unused-vars
    const [viewState, setViewState] = useState('list');
    const [editingQId, setEditingQId] = useState(null);
    const [editingJobId, setEditingJobId] = useState(null);
@@ -53,6 +64,7 @@ function Admin() {
    const [authMode, setAuthMode] = useState("login"); // 'login' or 'forgot'
    const [forgotEmail, setForgotEmail] = useState("");
 
+   // eslint-disable-next-line no-unused-vars
    const navigate = useNavigate();
    const { i18n } = useTranslation();
 
@@ -66,6 +78,7 @@ function Admin() {
       }
    };
 
+   // eslint-disable-next-line no-unused-vars
    const changeLang = (code) => {
       i18n.changeLanguage(code);
       if (code === 'ar') {
@@ -74,6 +87,7 @@ function Admin() {
          document.documentElement.dir = 'ltr';
       }
    };
+   // eslint-disable-next-line no-unused-vars
    const currentLang = (i18n.language || 'en').toUpperCase().substring(0, 2);
 
    useEffect(() => {
@@ -81,6 +95,7 @@ function Admin() {
          setIsLoggedIn(true);
          fetchData();
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [token]);
 
    const handleLogin = async (e) => {
@@ -694,6 +709,28 @@ function Admin() {
                                              title="Send Rejection Mail"
                                              style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#ef4444", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}
                                           ><i className="fas fa-envelope-open-text"></i></button>
+                                          <button
+                                             onClick={async () => {
+                                                if (window.confirm(`Are you sure you want to completely remove ${s.name}?`)) {
+                                                   setLoading(true);
+                                                   try {
+                                                      const resp = await fetch(`${API_BASE_URL}/api/admin/students/${s._id}`, {
+                                                         method: 'DELETE',
+                                                         headers: { 'x-auth-token': token }
+                                                      });
+                                                      const res = await resp.json();
+                                                      if (res.success) notify('success', res.message);
+                                                      else notify('error', res.message);
+                                                      fetchData();
+                                                   } catch (err) {
+                                                      notify('error', 'Failed to remove candidate');
+                                                   }
+                                                   setLoading(false);
+                                                }
+                                             }}
+                                             title="Remove Candidate"
+                                             style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#b91c1c", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}
+                                          ><i className="fas fa-trash"></i></button>
                                        </div>
                                     </td>
                                  </tr>

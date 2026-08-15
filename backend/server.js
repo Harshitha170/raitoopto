@@ -545,6 +545,20 @@ app.get('/api/admin/students', authenticateAdmin, async (req, res) => {
   }
 });
 
+// a1. ADMIN - DELETE STUDENT
+app.delete('/api/admin/students/:id', authenticateAdmin, async (req, res) => {
+  try {
+    if (isMockMode) {
+      await DB.Student.remove(req.params.id);
+    } else {
+      await DB.Student.findByIdAndDelete(req.params.id);
+    }
+    res.json({ success: true, message: 'Candidate removed' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete candidate' });
+  }
+});
+
 // a2. ADMIN - SEND INTERVIEW EMAIL
 app.post('/api/admin/send-selection-email', authenticateAdmin, async (req, res) => {
     try {

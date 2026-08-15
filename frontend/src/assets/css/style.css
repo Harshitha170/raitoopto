@@ -37,9 +37,9 @@ svg{display:block;flex-shrink:0;max-width:100%}
 /* ============================================================
    CURSOR
    ============================================================ */
-#cur{position:fixed;width:10px;height:10px;background:var(--Y);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--Yg);mix-blend-mode:multiply;transition:width .15s,height .15s}
+#cur{position:fixed;width:10px;height:10px;background:var(--Y);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--Yg);mix-blend-mode:multiply;transition:width .15s,height .15s}
 #cur.big{width:18px;height:18px}
-#cring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(247, 250, 95, 0.55);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .15s,height .15s}
+#cring{position:fixed;width:32px;height:32px;border:1.5px solid rgba(247, 250, 95, 0.55);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .15s,height .15s}
 #cring.big{width:46px;height:46px}
 
 /* Hide custom cursor on touch devices */
