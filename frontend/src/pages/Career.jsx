@@ -28,28 +28,91 @@ function getJobIcon(title) {
 }
 
 function PDFViewer({ url }) {
-  // Use Google Docs Viewer for iframe embedding - works with Cloudinary raw URLs
-  // The direct URL is used for "Open in New Tab" so the browser renders it natively
-  const googleDocsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+  const [blobUrl, setBlobUrl] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError(false);
+
+    const loadPdf = async () => {
+      try {
+        let resp = await fetch(url).catch(() => null);
+        if (!resp || !resp.ok) {
+          resp = await fetch(`${API_BASE_URL}/api/view-file?url=${encodeURIComponent(url)}`).catch(() => null);
+        }
+        if (resp && resp.ok) {
+          const blob = await resp.blob();
+          if (active) {
+            const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+            const objectUrl = URL.createObjectURL(pdfBlob);
+            setBlobUrl(objectUrl);
+            setLoading(false);
+          }
+        } else {
+          throw new Error('Failed to load PDF');
+        }
+      } catch (err) {
+        console.error('PDF load error:', err);
+        if (active) {
+          setError(true);
+          setLoading(false);
+        }
+      }
+    };
+
+    if (url) loadPdf();
+
+    return () => {
+      active = false;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, [url]);
+
+  const handleOpenNewTab = () => {
+    if (blobUrl) {
+      window.open(blobUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   return (
     <div style={{ background: '#f5f5f5', borderRadius: '8px', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#e8e8e8', borderBottom: '1px solid #ddd' }}>
-        <span style={{ fontSize: '11px', color: '#666', fontWeight: 600 }}>📄 PDF Preview</span>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ fontSize: '12px', fontWeight: 700, color: '#0A0A0C', textDecoration: 'none', background: 'var(--Y)', padding: '5px 14px', borderRadius: '5px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#e8e8e8', borderBottom: '1px solid #ddd' }}>
+        <span style={{ fontSize: '12px', color: '#333', fontWeight: 700 }}>📄 PDF Document</span>
+        <button
+          onClick={handleOpenNewTab}
+          style={{ fontSize: '12px', fontWeight: 700, color: '#0A0A0C', background: 'var(--Y)', padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}
         >
-          🔗 Open in New Tab
-        </a>
+          ↗ Open in New Tab
+        </button>
       </div>
-      <iframe
-        src={googleDocsViewerUrl}
-        style={{ width: '100%', height: '65vh', border: 'none', display: 'block' }}
-        title="Job Description PDF"
-      />
+      {loading ? (
+        <div style={{ padding: '60px', textAlign: 'center', color: '#666', fontSize: '14px', fontWeight: 600 }}>
+          ⏳ Loading PDF preview...
+        </div>
+      ) : error || !blobUrl ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: '#888', background: '#fff' }}>
+          <p style={{ marginBottom: '15px', fontSize: '14px' }}>Unable to load embedded preview.</p>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-block', background: '#0A0A0C', color: '#fff', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '13px' }}
+          >
+            View / Download File Directly →
+          </a>
+        </div>
+      ) : (
+        <iframe
+          src={`${blobUrl}#toolbar=1`}
+          style={{ width: '100%', height: '65vh', border: 'none', display: 'block', background: '#ffffff' }}
+          title="Job Description PDF"
+        />
+      )}
     </div>
   );
 }
@@ -60,7 +123,6 @@ function JDModal({ job, onClose }) {
     if (u.startsWith('http')) return u.replace(/^http:\/\//i, 'https://');
     return `${API_BASE_URL}/${u.replace(/^\//, '')}`;
   })();
-  const isDoc = /\.(doc|docx)$/i.test(rawUrl);
 
   return (
     <div style={{
@@ -106,15 +168,7 @@ function JDModal({ job, onClose }) {
           {job.jdFileUrl && (
             <div style={{ marginTop: "10px" }}>
               <div style={{ fontFamily: "Orbitron, sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "2px", color: "#888", marginBottom: "10px" }}>JD DOCUMENT</div>
-              {isDoc ? (
-                <iframe
-                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(rawUrl)}`}
-                  style={{ width: "100%", height: "600px", border: "1px solid #ddd", borderRadius: "8px" }}
-                  title="Job Description"
-                />
-              ) : (
-                <PDFViewer url={rawUrl} />
-              )}
+              <PDFViewer url={rawUrl} />
             </div>
           )}
         </div>

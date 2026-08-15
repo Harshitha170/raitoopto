@@ -13,6 +13,27 @@ const getFullUrl = (url) => {
    return `${API_BASE_URL}/${url.replace(/^\//, '')}`;
 };
 
+const viewPdfDocument = async (url) => {
+   if (!url) return;
+   const fullUrl = getFullUrl(url);
+   try {
+      let resp = await fetch(fullUrl).catch(() => null);
+      if (!resp || !resp.ok) {
+         resp = await fetch(`${API_BASE_URL}/api/view-file?url=${encodeURIComponent(fullUrl)}`).catch(() => null);
+      }
+      if (resp && resp.ok) {
+         const blob = await resp.blob();
+         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+         const blobUrl = URL.createObjectURL(pdfBlob);
+         window.open(blobUrl, '_blank', 'noopener,noreferrer');
+      } else {
+         window.open(fullUrl, '_blank', 'noopener,noreferrer');
+      }
+   } catch (e) {
+      window.open(fullUrl, '_blank', 'noopener,noreferrer');
+   }
+};
+
 // eslint-disable-next-line no-unused-vars
 const SOCIAL_LINKS = {
    facebook: "https://www.facebook.com/leibglr",
@@ -594,12 +615,12 @@ function Admin() {
                   </div>
                )}
 
-               {/* ATS RANKING VIEW (New!) */}
+               {/* ATS RANKING VIEW */}
                {activeTab === 'ats' && (
                   <div className="admin-card">
                      <div style={{ marginBottom: "30px" }}>
                         <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 800 }}>Applicant ATS Insights</h3>
-                        <p style={{ fontSize: "14px", color: "#666", marginTop: "5px" }}>Ranked list of candidates based on keyword matching and technical scores.</p>
+                        <p style={{ fontSize: "14px", color: "#666", marginTop: "5px" }}>Ranked list of candidates based on resume ATS matching and technical test scores.</p>
                      </div>
                      <div style={{ overflowX: "auto" }}>
                         <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "0 10px" }}>
@@ -608,11 +629,13 @@ function Admin() {
                                  <th style={{ padding: "12px 20px", fontSize: "12px", fontWeight: 800 }}>CANDIDATE</th>
                                  <th style={{ padding: "12px 20px", fontSize: "12px", fontWeight: 800 }}>POSITION</th>
                                  <th style={{ padding: "12px 20px", fontSize: "12px", fontWeight: 800 }}>MATCH RANK</th>
+                                 <th style={{ padding: "12px 20px", fontSize: "12px", fontWeight: 800, textAlign: "center" }}>SCORE (TEST)</th>
+                                 <th style={{ padding: "12px 20px", fontSize: "12px", fontWeight: 800, textAlign: "center" }}>RESUME</th>
                                  <th style={{ padding: "12px 20px", fontSize: "12px", fontWeight: 800, textAlign: "center" }}>STATUS</th>
                               </tr>
                            </thead>
                            <tbody>
-                              {[...students].sort((a, b) => b.atsScore - a.atsScore).map((s, idx) => (
+                              {[...students].sort((a, b) => (b.atsScore || 0) - (a.atsScore || 0)).map((s, idx) => (
                                  <tr key={s._id} style={{ background: "#fff", boxShadow: "0 2px 5px rgba(0,0,0,0.02)", borderRadius: "12px" }}>
                                     <td style={{ padding: "18px 20px", borderTopLeftRadius: "12px", borderBottomLeftRadius: "12px" }}>
                                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -626,13 +649,36 @@ function Admin() {
                                     <td style={{ padding: "18px 20px", fontWeight: 700, fontSize: "13px" }}>{s.appliedRole}</td>
                                     <td style={{ padding: "18px 20px" }}>
                                        <div style={{ width: "100%", maxWidth: "150px", height: "8px", background: "#eee", borderRadius: "10px", position: "relative", overflow: "hidden" }}>
-                                          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${s.atsScore}%`, background: s.atsScore > 80 ? '#10b981' : (s.atsScore > 60 ? '#f59e0b' : '#ef4444') }}></div>
+                                          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${s.atsScore || 0}%`, background: (s.atsScore || 0) > 80 ? '#10b981' : ((s.atsScore || 0) > 60 ? '#f59e0b' : '#ef4444') }}></div>
                                        </div>
-                                       <div style={{ fontSize: "10px", fontWeight: 800, color: "#666", marginTop: "5px" }}>{s.atsScore}% RELEVANCY</div>
+                                       <div style={{ fontSize: "10px", fontWeight: 800, color: "#666", marginTop: "5px" }}>{s.atsScore || 0}% RELEVANCY</div>
+                                    </td>
+                                    <td style={{ padding: "18px 20px", textAlign: "center" }}>
+                                       <span style={{ 
+                                          padding: "6px 14px", 
+                                          borderRadius: "100px", 
+                                          background: (s.testScore !== undefined && s.testScore >= 0) ? ((s.testScore >= 75) ? '#ecfdf5' : ((s.testScore >= 50) ? '#fffbeb' : '#fef2f2')) : '#f3f4f6', 
+                                          color: (s.testScore !== undefined && s.testScore >= 0) ? ((s.testScore >= 75) ? '#059669' : ((s.testScore >= 50) ? '#d97706' : '#dc2626')) : '#9ca3af', 
+                                          fontSize: "12px", 
+                                          fontWeight: 800 
+                                       }}>
+                                          {(s.testScore !== undefined && s.testScore >= 0) ? `${s.testScore}% (${s.correctCount || 0}/${s.totalQuestions || 0})` : 'N/A'}
+                                       </span>
+                                    </td>
+                                    <td style={{ padding: "18px 20px", textAlign: "center" }}>
+                                       {s.resumeUrl && (
+                                          <button 
+                                             onClick={() => viewPdfDocument(s.resumeUrl)} 
+                                             title="View Resume PDF" 
+                                             style={{ padding: "8px 12px", color: "var(--primary)", background: "var(--primary-light)", borderRadius: "8px", fontSize: "13px", border: "none", cursor: "pointer", fontWeight: 700 }}
+                                          >
+                                             <i className="fas fa-file-pdf" style={{ marginRight: "5px" }}></i> View PDF
+                                          </button>
+                                       )}
                                     </td>
                                     <td style={{ padding: "18px 20px", textAlign: "center", borderTopRightRadius: "12px", borderBottomRightRadius: "12px" }}>
-                                       <span style={{ padding: "6px 14px", borderRadius: "100px", background: s.atsScore > 75 ? "#ecfdf5" : "#fffbeb", color: s.atsScore > 75 ? "#059669" : "#d97706", fontSize: "11px", fontWeight: 800 }}>
-                                          {s.atsScore > 75 ? 'HIGH POTENTIAL' : 'REVIEW NEEDED'}
+                                       <span style={{ padding: "6px 14px", borderRadius: "100px", background: (s.atsScore || 0) > 75 ? "#ecfdf5" : "#fffbeb", color: (s.atsScore || 0) > 75 ? "#059669" : "#d97706", fontSize: "11px", fontWeight: 800 }}>
+                                          {(s.atsScore || 0) > 75 ? 'HIGH POTENTIAL' : 'REVIEW NEEDED'}
                                        </span>
                                     </td>
                                  </tr>
@@ -656,6 +702,7 @@ function Admin() {
                                  <th style={{ padding: "18px 25px", fontSize: "12px", fontWeight: 800, borderRadius: "12px 0 0 12px" }}>IDENTITY</th>
                                  <th style={{ padding: "18px 25px", fontSize: "12px", fontWeight: 800 }}>POSITION</th>
                                  <th style={{ padding: "18px 25px", fontSize: "12px", fontWeight: 800, textAlign: "center" }}>ATS SCORE</th>
+                                 <th style={{ padding: "18px 25px", fontSize: "12px", fontWeight: 800, textAlign: "center" }}>TEST SCORE</th>
                                  <th style={{ padding: "18px 25px", fontSize: "12px", fontWeight: 800, textAlign: "center", borderRadius: "0 12px 12px 0" }}>ACTIONS</th>
                               </tr>
                            </thead>
@@ -668,11 +715,23 @@ function Admin() {
                                      </td>
                                      <td style={{ padding: "18px 25px", fontSize: "14px", fontWeight: 600 }}>{s.appliedRole}</td>
                                      <td style={{ padding: "18px 25px", textAlign: "center" }}>
-                                        <span style={{ padding: "8px 16px", borderRadius: "100px", background: s.atsScore > 75 ? "#f1fdf4" : "#fefce8", color: s.atsScore > 75 ? "#16a34a" : "#047225", fontWeight: 900, fontSize: "12px" }}>{s.atsScore}% </span>
+                                        <span style={{ padding: "8px 16px", borderRadius: "100px", background: (s.atsScore || 0) > 75 ? "#f1fdf4" : "#fefce8", color: (s.atsScore || 0) > 75 ? "#16a34a" : "#047225", fontWeight: 900, fontSize: "12px" }}>{(s.atsScore || 0)}% </span>
+                                     </td>
+                                     <td style={{ padding: "18px 25px", textAlign: "center" }}>
+                                        <span style={{ 
+                                           padding: "8px 16px", 
+                                           borderRadius: "100px", 
+                                           background: (s.testScore !== undefined && s.testScore >= 0) ? ((s.testScore >= 75) ? '#ecfdf5' : ((s.testScore >= 50) ? '#fffbeb' : '#fef2f2')) : '#f3f4f6', 
+                                           color: (s.testScore !== undefined && s.testScore >= 0) ? ((s.testScore >= 75) ? '#059669' : ((s.testScore >= 50) ? '#d97706' : '#dc2626')) : '#9ca3af', 
+                                           fontWeight: 900, 
+                                           fontSize: "12px" 
+                                        }}>
+                                           {(s.testScore !== undefined && s.testScore >= 0) ? `${s.testScore}%` : 'N/A'}
+                                        </span>
                                      </td>
                                      <td style={{ padding: "18px 25px", textAlign: "center", borderRadius: "0 12px 12px 0" }}>
                                         <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-                                           <button onClick={() => { window.open(getFullUrl(s.resumeUrl), '_blank', 'noopener,noreferrer'); }} title="View CV" style={{ padding: "10px", color: "var(--primary)", background: "var(--primary-light)", borderRadius: "10px", fontSize: "14px", border: "none", cursor: "pointer" }}><i className="fas fa-file-pdf"></i></button>
+                                           <button onClick={() => viewPdfDocument(s.resumeUrl)} title="View CV (PDF)" style={{ padding: "10px", color: "var(--primary)", background: "var(--primary-light)", borderRadius: "10px", fontSize: "14px", border: "none", cursor: "pointer" }}><i className="fas fa-file-pdf"></i></button>
                                            <button onClick={async () => { if (window.confirm(`Send selection email to ${s.name}?`)) { setLoading(true); const resp = await fetch(`${API_BASE_URL}/api/admin/send-selection-email`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': token }, body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name }) }); const res = await resp.json(); if (res.success) notify('success', res.message); else notify('error', res.message); setLoading(false); } }} title="Send Selection Mail" style={{ padding: "10px", border: "none", background: "#ecfdf5", color: "#10b981", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}><i className="fas fa-paper-plane"></i></button>
                                            <button onClick={async () => { if (window.confirm(`Send rejection email to ${s.name}?`)) { setLoading(true); const resp = await fetch(`${API_BASE_URL}/api/admin/send-rejection-email`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': token }, body: JSON.stringify({ studentId: s._id, email: s.email, name: s.name }) }); const res = await resp.json(); if (res.success) notify('success', res.message); else notify('error', res.message); setLoading(false); } }} title="Send Rejection Mail" style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#ef4444", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}><i className="fas fa-envelope-open-text"></i></button>
                                            <button onClick={async () => { if (window.confirm(`Are you sure you want to completely remove ${s.name}?`)) { setLoading(true); try { const resp = await fetch(`${API_BASE_URL}/api/admin/students/${s._id}`, { method: 'DELETE', headers: { 'x-auth-token': token } }); const res = await resp.json(); if (res.success) notify('success', res.message); else notify('error', res.message); fetchData(); } catch (err) { notify('error', 'Failed to remove candidate'); } setLoading(false); } }} title="Remove Candidate" style={{ padding: "10px", border: "none", background: "#fef2f2", color: "#b91c1c", borderRadius: "10px", cursor: "pointer", fontSize: "14px" }}><i className="fas fa-trash"></i></button>
