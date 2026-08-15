@@ -36,10 +36,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   }
 }));
 
-// --- EMAIL TRANSPORTER ---
+// --- EMAIL SERVICE SETUP ---
 const emailUser = (process.env.EMAIL_USER || 'harshuchethu3@gmail.com').trim();
 const emailPass = (process.env.EMAIL_PASS || 'gychdfekijpkaymz').replace(/\s+/g, '');
+const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
+const emailWebhookUrl = (process.env.EMAIL_WEBHOOK_URL || '').trim();
 
+// Nodemailer SMTP fallback (for local development or unblocked networks)
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -48,19 +51,96 @@ const transporter = nodemailer.createTransport({
     user: emailUser,
     pass: emailPass
   },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000,
+  connectionTimeout: 8000,
+  greetingTimeout: 8000,
+  socketTimeout: 10000,
   tls: {
     rejectUnauthorized: false
   }
 });
 
-// Verify Transporter
-transporter.verify((error, success) => {
-    if (error) console.error("Email Transporter Error:", error.message || error);
-    else console.log("Email Transporter Ready.");
-});
+// Universal Email Dispatcher (Bypasses Render SMTP port blocking via HTTPS APIs)
+const sendEmail = async ({ to, subject, html }) => {
+  // 1. Resend API (HTTP REST - Port 443, never blocked by Render)
+  if (resendApiKey) {
+    console.log('Sending email via Resend HTTP API to:', to);
+    const https = require('https');
+    return new Promise((resolve, reject) => {
+      const payload = JSON.stringify({
+        from: process.env.RESEND_FROM || 'Laser Experts India <onboarding@resend.dev>',
+        to: [to],
+        subject: subject,
+        html: html
+      });
+      const req = https.request({
+        hostname: 'api.resend.com',
+        path: '/emails',
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload)
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(JSON.parse(data));
+          } else {
+            reject(new Error(`Resend API failed (${res.statusCode}): ${data}`));
+          }
+        });
+      });
+      req.on('error', reject);
+      req.write(payload);
+      req.end();
+    });
+  }
+
+  // 2. Custom Webhook / Google Apps Script (HTTP REST - Port 443)
+  if (emailWebhookUrl) {
+    console.log('Sending email via Webhook HTTP API to:', to);
+    const https = require('https');
+    const http = require('http');
+    const client = emailWebhookUrl.startsWith('https') ? https : http;
+    const urlObj = new URL(emailWebhookUrl);
+    return new Promise((resolve, reject) => {
+      const payload = JSON.stringify({ to, subject, html, from: emailUser });
+      const req = client.request({
+        hostname: urlObj.hostname,
+        path: urlObj.pathname + urlObj.search,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload)
+        }
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve({ success: true, data });
+          } else {
+            reject(new Error(`Webhook failed (${res.statusCode}): ${data}`));
+          }
+        });
+      });
+      req.on('error', reject);
+      req.write(payload);
+      req.end();
+    });
+  }
+
+  // 3. SMTP Fallback
+  console.log('Sending email via SMTP to:', to);
+  return transporter.sendMail({
+    from: `"Laser Experts India" <${emailUser}>`,
+    to,
+    subject,
+    html
+  });
+};
 
 // MongoDB Connection
 // --- SEEDING ENGINE ---
@@ -327,7 +407,7 @@ app.post('/api/admin/forgot-password', async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    await sendEmail(mailOptions);
     res.json({ message: 'Recovery email sent successfully' });
   } catch (err) {
     console.error('Forgot Password Error:', err);
@@ -642,15 +722,15 @@ app.post('/api/admin/send-selection-email', authenticateAdmin, async (req, res) 
             `
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully:', info.messageId);
+        const info = await sendEmail(mailOptions);
+        console.log('Email sent successfully:', info?.messageId || info?.id || 'OK');
         res.json({ success: true, message: 'Interview selection email sent successfully!' });
     } catch (err) {
-        console.error('CRITICAL SMTP ERROR:', err);
+        console.error('CRITICAL EMAIL ERROR:', err);
         // Provide more detailed feedback to admin
         let errorMsg = err.message;
         if (err.code === 'EAUTH') errorMsg = "Authentication Failed: Check Gmail App Password.";
-        if (err.code === 'ESOCKET') errorMsg = "Network Error: Could not connect to SMTP server.";
+        if (err.code === 'ESOCKET' || err.message.includes('timeout')) errorMsg = "SMTP Port Blocked by Cloud Host: Add RESEND_API_KEY to Render Environment.";
         
         res.status(500).json({ 
             success: false, 
@@ -705,14 +785,14 @@ app.post('/api/admin/send-rejection-email', authenticateAdmin, async (req, res) 
             `
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Rejection email sent successfully:', info.messageId);
+        const info = await sendEmail(mailOptions);
+        console.log('Rejection email sent successfully:', info?.messageId || info?.id || 'OK');
         res.json({ success: true, message: 'Rejection email sent successfully!' });
     } catch (err) {
-        console.error('CRITICAL SMTP ERROR:', err);
+        console.error('CRITICAL EMAIL ERROR:', err);
         let errorMsg = err.message;
         if (err.code === 'EAUTH') errorMsg = "Authentication Failed: Check Gmail App Password.";
-        if (err.code === 'ESOCKET') errorMsg = "Network Error: Could not connect to SMTP server.";
+        if (err.code === 'ESOCKET' || err.message.includes('timeout')) errorMsg = "SMTP Port Blocked by Cloud Host: Add RESEND_API_KEY to Render Environment.";
         
         res.status(500).json({ 
             success: false, 
