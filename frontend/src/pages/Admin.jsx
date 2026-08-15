@@ -14,6 +14,9 @@ const getFullUrl = (url) => {
        const cleanPath = url.replace(/^\//, '');
        finalUrl = `${API_BASE_URL}/${cleanPath}`;
    }
+   if (finalUrl.includes('cloudinary.com')) {
+       finalUrl += finalUrl.includes('?') ? '&fl=inline' : '?fl=inline';
+   }
    return finalUrl;
 };
 
